@@ -1,0 +1,27 @@
+name: NC-DataEng-ETL-Project-CICD
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  run-tests:
+    name: run-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout and clone repo
+        uses: actions/checkout@v4
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+      - name: Create environment
+        run: make requirements
+      - name: Run security checks
+        run: make run-security
+      - name: Run formatter and tests
+        run: make run-checks
