@@ -11,7 +11,7 @@ terraform {
   }
   backend "s3" {
     bucket = "terrific-totes-lullymore-backend"
-    # key = *"path/to/my/key"*
+    key = "nc-dataeng-etl-project/terraform.tfstate"
     region = "eu-west-2"
   }
 }
