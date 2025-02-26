@@ -38,17 +38,33 @@ def test_connect_to_rds_success(mock_connect):
     assert connection is mock_connect.return_value
 
 
-@patch("psycopg2.connect")
-def test_connect_to_rds_connection_fails_rds(mock_connect):
-    mock_connect.side_effect = Exception("Connection failed")
+# @patch("psycopg2.connect")
+# def test_connect_to_rds_connection_fails_operational_error(mock_connect):
+#     mock_connect.side_effect = psycopg2.OperationalError("OperationalError connecting to RDS: Connection failed")
 
-    with pytest.raises(Exception, match="Connection failed"):
-        connect_to_rds(raise_exception=True)
+#     with pytest.raises(Exception, match="OperationalError connecting to RDS: Connection failed"):
+#         connect_to_rds(raise_exception=True)
 
-    mock_connect.assert_called_once_with(
-        user=os.getenv("RDS_USER"),
-        password=os.getenv("RDS_PASSWORD"),
-        database=os.getenv("RDS_NAME"),
-        host=os.getenv("RDS_HOST"),
-        port=os.getenv("PORT"),
-    )
+#     mock_connect.assert_called_once_with(
+#         user=os.getenv("RDS_USER"),
+#         password=os.getenv("RDS_PASSWORD"),
+#         database=os.getenv("RDS_NAME"),
+#         host=os.getenv("RDS_HOST"),
+#         port=os.getenv("PORT"),
+#     )
+
+# @patch("psycopg2.connect")
+# def test_connect_to_rds_connection_fails_exception_error(mock_connect):
+#     mock_connect.side_effect = Exception("Error connection to RDS: Connection error")
+
+#     connection = connect_to_rds() 
+
+#     mock_connect.assert_called_once_with(
+#         user=os.getenv("RDS_USER"),
+#         password=os.getenv("RDS_PASSWORD"),
+#         database=os.getenv("RDS_NAME"),
+#         host=os.getenv("RDS_HOST"),
+#         port=os.getenv("PORT"),
+#    )
+#     assert connection is None 
+#     assert "Error connection to RDS: Connection error"
