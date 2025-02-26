@@ -25,6 +25,6 @@ variable "state_machine_name" {
   default = "terrific-totes-"
 }
 
-variable "S3_BUCKET_PREFIX" {
-  type = string
-}
+# variable "S3_BUCKET_PREFIX" {
+#   type = string
+# }

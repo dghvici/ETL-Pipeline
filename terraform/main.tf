@@ -8,11 +8,12 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-  }
-  backend "s3" {
-    bucket = "terrific-totes-lullymore-backend"
-    # key = *"path/to/my/key"*
-    region = "eu-west-2"
+    # }
+    # backend "s3" {
+    #   bucket = "terrific-totes-lullymore-backend"
+    #   # key = *"path/to/my/key"*
+    #   region = "eu-west-2"
+    # }
   }
 }
 
@@ -22,8 +23,8 @@ provider "aws" {
 
   default_tags {
     tags = { ProjectName = "De-terrific-totes-lullymore-west"
-    DeployedFrom = "terraform"
-    Repository = "NC-DATAENG-ETL-PROJECT"
+      DeployedFrom = "terraform"
+      Repository   = "NC-DATAENG-ETL-PROJECT"
     }
   }
 }
