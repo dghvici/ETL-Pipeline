@@ -1,42 +1,31 @@
-import boto3
 import psycopg2
 import logging
 from dotenv import load_dotenv
 import os
-import sys
-import json
+
 
 load_dotenv()
 
-def connect_to_rds(): 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
-    user=os.getenv("PG_USER")
-    password=os.getenv("PG_PASSWORD")
-    database=os.getenv("DB_NAME")
-    host=os.getenv("DB_HOST")
-    port=os.getenv("PORT")
 
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
+def connect_to_rds(raise_exception=False):
     try:
-         conn = psycopg2.connect(
-            host=host, 
-            user=user, 
-            password=password, 
-            database=database
-            )
-    except pymysql.MySQLError as e:
-        logger.error("ERROR: Unexpected error: Could not connect to MySQL instance.")
-        logger.error(e)
-
-    logger.info("SUCCESS: Connection to RDS for MySQL instance succeeded")
-    print(conn)
-
-    return conn
-    
-conn = connect_to_rds()
-print(conn, '<<line 44')
+        connection = psycopg2.connect(
+            user=os.getenv("RDS_USER"),
+            password=os.getenv("RDS_PASSWORD"),
+            database=os.getenv("RDS_NAME"),
+            host=os.getenv("RDS_HOST"),
+            port=os.getenv("PORT"),
+        )
+        return connection
+    except Exception as error:
+        logger.error(f"Error connecting to RDS: {error}")
+        if raise_exception:
+            raise error
+        else:
+            return None
 
 def close_rds(conn):
     conn.close()
