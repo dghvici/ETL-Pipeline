@@ -1,0 +1,56 @@
+data "aws_iam_policy_document" "s3_document" {
+  statement {
+    actions = [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+    ]
+    resources = [
+      "${aws_s3_bucket.ingestion_bucket.arn}/*",
+      "${aws_s3_bucket.transform_bucket.arn}/*",
+    ]
+  }
+}
+
+
+resource "aws_iam_policy" "s3_policy" {
+  name_prefix = "s3-policy-terrific-totes-lambda-"
+  policy      = data.aws_iam_policy_document.s3_document.json
+}
+
+resource "aws_iam_role" "iam_for_lambda" {
+  name               = "iam_for_lambda"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+# resource "aws_iam_role" "lambda_role" {
+#   name_prefix        = "role-lambdas-"
+#   assume_role_policy = aws_iam_policy_attachment.lambda_policy.json
+# }
+
+resource "aws_iam_policy_attachment" "lambda_policy" {
+  name = "lambda_policy_for_lambda"
+  policy_arn = data.aws_iam_policy_document.assume_role.json
+  roles = [aws_iam_role.iam_for_lambda.name]
+}
+
+resource "aws_iam_policy_attachment" "lambda_s3_attachment" {
+  name       = "s3_policy_for_lambda"
+  policy_arn = aws_iam_policy.s3_policy.arn
+  roles = [aws_iam_role.iam_for_lambda.name]
+}
+
+
