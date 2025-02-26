@@ -11,7 +11,7 @@ terraform {
   }
   backend "s3" {
     bucket = "terrific-totes-lullymore-backend"
-    # key = *"path/to/my/key"*
+    key = "nc-dataeng-etl-project/terraform.tfstate"
     region = "eu-west-2"
   }
 }
@@ -29,5 +29,4 @@ provider "aws" {
 }
 
 # data "aws_caller_identity" "current" {}
-
 # data "aws_region" "current" {}
