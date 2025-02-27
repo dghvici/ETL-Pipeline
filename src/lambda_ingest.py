@@ -1,29 +1,43 @@
 import boto3
 import json
+from utils.ingest_utils import check_database_updated, get_parameter
+from utils.connection import connect_to_rds, close_rds
+from datetime import datetime
+from botocore import ClientError
 
+ssm = boto3.client("ssm", "eu-west-2")
+
+
+# trigered by the state machine every 30min
 def lambda_handler_ingest(event, context):
-        # trigered by the state machine every 30min
-        # check for updated data --> use util check_for updates
-        # util returns table names of data that has been updated
-        # for table in all returned table names
-        # first instance --> ingest all data 
-                # connect to database
-                # fetch parameter from store: time previous and time now 
-                # SELECT * FROM table WHER time.previous < time.now
-                # extract last updated data 
-                # Json dump to S3 --> make sure a new object is created all the time 
-                        # s3_client = boto3.client("s3")
-                        # body = json.dumps("requirements.txt") add timestamp to name
-                        # key = "random_file"
-                        # bucket = "lullymore-west-ingested"
-                        # s3_client.put_object(Bucket=bucket, Key=key, Body=body)
+        try:
+            updated_data_tables = check_database_updated()
+            if updated_data_tables == []:
+                  return "No new data."
+            else:
+                for table in updated_data_tables:
+                        conn = connect_to_rds()
+                        cur = conn.cursor()
+                        previous_time = get_parameter(ssm, "timestamp_prev")
+                        current_time = get_parameter(ssm, "timestamp_now")
+                        query = f"""SELECT * FROM {table} 
+                        WHERE last_updated BETWEEN '{previous_time}' and '{current_time}';"""
+                        response = cur.run(query)
+                        conn.close_rds()
+                        s3_client = boto3.client("s3")
+                        body = json.dumps(response) 
+                        key = f"ingested{datetime.now()}"
+                        bucket = "lullymore-west-ingested"
+                        s3_client.put_object(Bucket=bucket, Key=key, Body=body)
+                return "All data has been ingested."
         # consecutive runs ingest data that's been recently adaded 
         # TO CONSIDER
-        # except ClientError
+        except ClientError as e:
                 # DB connection - considered already
+                if e =="DB conn":
+                      raise "Can't connect to DataBase"
                 # check updated - considered already
                 # parameter store error --> raise previously? 
                 # write to s3 --> to be captured here
-       
-        return True
+
 

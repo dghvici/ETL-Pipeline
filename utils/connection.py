@@ -32,6 +32,16 @@ def connect_to_rds(raise_exception=False):
         if raise_exception:
             raise
         return None
+    
+# def connect_to_rds():
+#     connection = psycopg2.connect(
+#         user=os.getenv("RDS_USER"),
+#         password=os.getenv("RDS_PASSWORD"),
+#         database=os.getenv("RDS_NAME"),
+#         host=os.getenv("RDS_HOST"),
+#         port=os.getenv("PORT"),
+#         )
+#     return connection
 
 
 def execute_query(query, params=None):
