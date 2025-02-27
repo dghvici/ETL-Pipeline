@@ -11,11 +11,11 @@ terraform {
       version = "2.7.0"
     }
   }
-  # backend "s3" {
-  #   bucket = "terrific-totes-lullymore-backend"
-  #   # key = *"path/to/my/key"*
-  #   region = "eu-west-2"
-  # }
+  backend "s3" {
+    bucket = "terrific-totes-lullymore-backend"
+    # key = *"path/to/my/key"*
+    region = "eu-west-2"
+  }
 }
 
 
