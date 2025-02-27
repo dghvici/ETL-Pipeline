@@ -59,7 +59,6 @@ CREATE TABLE counterparty (
     counterparty_id SERIAL PRIMARY KEY,
     counterparty_legal_name VARCHAR,
     legal_address_id INT,
-    FOREIGN KEY (legal_address_id) REFERENCES address(address_id),
     commercial_contact VARCHAR,
     delivery_contact VARCHAR,
     created_at TIMESTAMP,
@@ -86,7 +85,6 @@ CREATE TABLE staff (
     first_name VARCHAR,
     last_name VARCHAR,
     department_id INT,
-    FOREIGN KEY (department_id) REFERENCES department(department_id),
     email_address VARCHAR,
     created_at TIMESTAMP,
     last_updated TIMESTAMP
@@ -100,18 +98,13 @@ CREATE TABLE sales_order (
     created_at TIMESTAMP,
     last_updated TIMESTAMP,
     design_id INT,
-    FOREIGN KEY (design_id) REFERENCES design(design_id),
     staff_id INT,
-    FOREIGN KEY (staff_id) REFERENCES staff(staff_id),
     counterparty_id INT,
-    FOREIGN KEY (counterparty_id) REFERENCES counterparty(counterparty_id),
     units_sold INT,
     unit_price NUMERIC,
     currency_id INT,
-    FOREIGN KEY (currency_id) REFERENCES currency(currency_id),
     agreed_delivery_date VARCHAR,
-    agreed_delivery_location_id INT,
-    FOREIGN KEY (agreed_delivery_location_id) REFERENCES address(address_id)
+    agreed_delivery_location_id INT
 );
 
 
@@ -122,18 +115,14 @@ CREATE TABLE purchase_order (
     created_at TIMESTAMP,
     last_updated TIMESTAMP,
     staff_id INT,
-    FOREIGN KEY (staff_id) REFERENCES staff(staff_id),
     counterparty_id INT,
-    FOREIGN KEY (counterparty_id) REFERENCES counterparty(counterparty_id),
     item_code VARCHAR,
     item_quantity INT,
     item_unit_price NUMERIC,
     currency_id INT,
-    FOREIGN KEY (currency_id) REFERENCES currency(currency_id),
     agreed_delivery_date VARCHAR,
     agreed_payment_date VARCHAR,
-    agreed_delivery_location_id INT,
-    FOREIGN KEY (agreed_delivery_location_id) REFERENCES address(address_id)
+    agreed_delivery_location_id INT
 );
 
 
@@ -143,9 +132,7 @@ CREATE TABLE transaction (
     transaction_id SERIAL PRIMARY KEY,
     transaction_type VARCHAR,
     sales_order_id INT,
-    FOREIGN KEY (sales_order_id) REFERENCES sales_order(sales_order_id),
     purchase_order_id INT,
-    FOREIGN KEY (purchase_order_id) REFERENCES purchase_order(purchase_order_id),
     created_at TIMESTAMP,
     last_updated TIMESTAMP
 );
@@ -158,14 +145,10 @@ CREATE TABLE payment (
     created_at TIMESTAMP,
     last_updated TIMESTAMP,
     transaction_id INT,
-    FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id),
     counterparty_id INT,
-    FOREIGN KEY (counterparty_id) REFERENCES counterparty(counterparty_id),
     payment_amount NUMERIC,
     currency_id INT,
-    FOREIGN KEY (currency_id) REFERENCES currency(currency_id),
     payment_type_id INT,
-    FOREIGN KEY (payment_type_id) REFERENCES payment_type(payment_type_id),
     paid BOOLEAN,
     payment_date VARCHAR,
     company_ac_number INT,
@@ -206,11 +189,11 @@ VALUES
 
 
 INSERT INTO counterparty
-    (counterparty_legal_name, commercial_contact, delivery_contact, created_at, last_updated)
+    (counterparty_legal_name, legal_address_id, commercial_contact, delivery_contact, created_at, last_updated)
 VALUES
-    ('Dad and Sons', 'Jason Todd', 'Felicity Smoak', now(), now()),
-    ('Money LLC', 'Katy Kane', 'Barry Allen', now(), now()),
-    ('Handbag Inc', 'Diana Prince', 'Alfred Pennyworth', now(), now());
+    ('Dad and Sons', 1, 'Jason Todd', 'Felicity Smoak', now(), now()),
+    ('Money LLC', 2, 'Katy Kane', 'Barry Allen', now(), now()),
+    ('Handbag Inc', 3, 'Diana Prince', 'Alfred Pennyworth', now(), now());
 
 
 INSERT INTO department
@@ -222,40 +205,40 @@ VALUES
 
 
 INSERT INTO staff
-    (first_name, last_name, email_address, created_at, last_updated)
+    (first_name, last_name, department_id, email_address, created_at, last_updated)
 VALUES
-    ('Pamela', 'Isley', 'pamelaisley@terrifictotes.com', now(), now()),
-    ('Harleen', 'Quinzell', 'harleenquinzell@terrifictotes.com', now(), now()),
-    ('Oswald', 'Cobblepot', 'oswaldcobblepot@terrifictotes.com', now(), now());
+    ('Pamela', 'Isley', 1, 'pamelaisley@terrifictotes.com', now(), now()),
+    ('Harleen', 'Quinzell', 2, 'harleenquinzell@terrifictotes.com', now(), now()),
+    ('Oswald', 'Cobblepot', 3, 'oswaldcobblepot@terrifictotes.com', now(), now());
 
 
 INSERT INTO sales_order
-    (created_at, last_updated, units_sold, unit_price, agreed_delivery_date)
+    (created_at, last_updated, design_id, staff_id, counterparty_id, units_sold, unit_price, currency_id, agreed_delivery_date, agreed_delivery_location_id)
 VALUES
-    (now(), now(), 45841, 5.50, 2021-11-26),
-    (now(), now(), 43214, 4.30, 2022-02-11),
-    (now(), now(), 21451, 8.99, 2022-16-01);
+    (now(), now(), 1, 1, 1, 45841, 5.50, 1, 2021-11-26, 1),
+    (now(), now(), 2, 2, 2, 43214, 4.30, 2, 2022-02-11, 2),
+    (now(), now(), 3, 3, 3, 21451, 8.99, 3, 2022-16-01, 3);
 
 
 INSERT INTO purchase_order
-    (created_at, last_updated, item_code, item_quantity, item_unit_price, agreed_delivery_date, agreed_payment_date)
+    (created_at, last_updated, staff_id, counterparty_id, item_code, item_quantity, item_unit_price, currency_id, agreed_delivery_date, agreed_payment_date, agreed_delivery_location_id)
 VALUES
-    (now(), now(), 'DNG65DT', 400, 548.25, 2021-11-26, 2021-12-26),
-    (now(), now(), '7FEHT5Y', 9999, 12.50, 2022-02-11, 2022-03-11),
-    (now(), now(), 'FE456GH', 54, 999.30, 2022-06-01, 2022-07-01);
+    (now(), now(), 1, 1, 'DNG65DT', 400, 548.25, 1, 2021-11-26, 2021-12-26, 1),
+    (now(), now(), 2, 2, '7FEHT5Y', 9999, 12.50, 2, 2022-02-11, 2022-03-11, 2),
+    (now(), now(), 3, 3, 'FE456GH', 54, 999.30, 3, 2022-06-01, 2022-07-01, 3);
 
 
 INSERT INTO transaction
-    (transaction_type, created_at, last_updated)
+    (transaction_type, sales_order_id, purchase_order_id, created_at, last_updated)
 VALUES
-    ('SALE', now(), now()),
-    ('PURCHASE', now(), now()),
-    ('PURCHASE', now(), now());
+    ('SALE', 1, 1, now(), now()),
+    ('PURCHASE', 2, 2, now(), now()),
+    ('PURCHASE', 3, 3, now(), now());
 
 
 INSERT INTO payment
-    (created_at, last_updated, payment_amount, paid, payment_date, company_ac_number, counterparty_ac_number)
+    (created_at, last_updated, transaction_id, counterparty_id, payment_amount, currency_id, payment_type_id, paid, payment_date, company_ac_number, counterparty_ac_number)
 VALUES
-    (now(), now(), 645724.50, TRUE, 2021-12-26, 9854217, 98745124),
-    (now(), now(), 225410.41, TRUE, 2022-03-11, 4578124, 45124547),
-    (now(), now(), 895874.99, FALSE, 2022-07-01, 4512114, 69695232);
+    (now(), now(), 1, 1, 645724.50, 1, 1, TRUE, 2021-12-26, 9854217, 98745124),
+    (now(), now(), 2, 2, 225410.41, 2, 2, TRUE, 2022-03-11, 4578124, 45124547),
+    (now(), now(), 3, 3, 895874.99, 3, 3, FALSE, 2022-07-01, 4512114, 69695232);
