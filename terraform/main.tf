@@ -1,6 +1,4 @@
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs
-# https://developer.hashicorp.com/terraform/language/backend/s3 (notes on backend bucket)
-
+# Configure the AWS Provider
 
 terraform {
   required_providers {
@@ -8,18 +6,21 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    # }
-    # backend "s3" {
-    #   bucket = "terrific-totes-lullymore-backend"
-    #   # key = *"path/to/my/key"*
-    #   region = "eu-west-2"
-    # }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "2.7.0"
+    }
+  }
+  backend "s3" {
+    bucket = "terrific-totes-lullymore-backend"
+    # key = *"path/to/my/key"*
+    region = "eu-west-2"
   }
 }
 
-# Configure the AWS Provider
+
 provider "aws" {
-  region = "eu-west-2"
+  region = data.aws_region.current.name
 
   default_tags {
     tags = { ProjectName = "De-terrific-totes-lullymore-west"
@@ -29,6 +30,6 @@ provider "aws" {
   }
 }
 
-# data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {}
 
-# data "aws_region" "current" {}
+data "aws_region" "current" {}
