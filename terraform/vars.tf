@@ -2,17 +2,17 @@
 
 variable "ingest_lambda" {
   type    = string
-  default = "Ingest Lambda"
+  default = "Ingest-Lambda"
 }
 
 variable "transform_lambda" {
   type    = string
-  default = "Transform Lambda"
+  default = "Transform-Lambda"
 }
 
 variable "load_lambda" {
   type    = string
-  default = "Load Lambda"
+  default = "Load-Lambda"
 }
 
 variable "default_timeout" {

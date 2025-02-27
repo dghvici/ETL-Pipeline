@@ -11,16 +11,16 @@ terraform {
       version = "2.7.0"
     }
   }
-  backend "s3" {
-    bucket = "terrific-totes-lullymore-backend"
-    # key = *"path/to/my/key"*
-    region = "eu-west-2"
-  }
+  # backend "s3" {
+  #   bucket = "terrific-totes-lullymore-backend"
+  #   # key = *"path/to/my/key"*
+  #   region = "eu-west-2"
+  # }
 }
 
 
 provider "aws" {
-  region = data.aws_region.current.name
+  region = "eu-west-2"
 
   default_tags {
     tags = { ProjectName = "De-terrific-totes-lullymore-west"
