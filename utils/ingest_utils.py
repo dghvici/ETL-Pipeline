@@ -39,10 +39,12 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
 
 
 def check_database_updated():
-    """Function to check if the database has been updated since the last
-    time it was checked. Returns a list of the updated table names
-    if the database has been updated, and an empty list if there have been
-    no updates to the database"""
+    """Function to check if the database has been updated since the last time
+    it was checked.
+
+    Returns a list of the updated table names if the database has been updated,
+    and an empty list if there have been no updates to the database
+    """
 
     conn = None
     all_table_names = [
