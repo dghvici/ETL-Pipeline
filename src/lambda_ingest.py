@@ -3,7 +3,8 @@ import json
 from utils.ingest_utils import check_database_updated, get_parameter
 from utils.connection import connect_to_rds, close_rds
 from datetime import datetime
-from botocore import ClientError
+from botocore.exceptions import ClientError
+
 
 ssm = boto3.client("ssm", "eu-west-2")
 
@@ -22,8 +23,8 @@ def lambda_handler_ingest(event, context):
                         current_time = get_parameter(ssm, "timestamp_now")
                         query = f"""SELECT * FROM {table} 
                         WHERE last_updated BETWEEN '{previous_time}' and '{current_time}';"""
-                        response = cur.run(query)
-                        conn.close_rds()
+                        response = cur.execute(query)
+                        close_rds(conn)
                         s3_client = boto3.client("s3")
                         body = json.dumps(response) 
                         key = f"ingested{datetime.now()}"
