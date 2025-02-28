@@ -44,23 +44,23 @@ def connect_to_rds(raise_exception=False):
 #     return connection
 
 
-def execute_query(query, params=None):
-    conn = connect_to_rds()
-    if conn is None:
-        logger.error("Failed to connect to RDS")
-        return None
+# def execute_query(query, params=None):
+#     conn = connect_to_rds()
+#     if conn is None:
+#         logger.error("Failed to connect to RDS")
+#         return None
     
-    try:
-        cursor = conn.cursor()
-        cursor.execute(query, params)
-        results = cursor.fetchall()
-        cursor.close()
-        return results
-    except Exception as error:
-        logger.error(f"Error executing query: {error}")
-        return None
-    finally: 
-        close_rds(conn)
+#     try:
+#         cursor = conn.cursor()
+#         cursor.execute(query, params)
+#         results = cursor.fetchall()
+#         cursor.close()
+#         return results
+#     except Exception as error:
+#         logger.error(f"Error executing query: {error}")
+#         return None
+#     finally: 
+#         close_rds(conn)
 
 def close_rds(conn):
     if conn is not None: 

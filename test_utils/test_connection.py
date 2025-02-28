@@ -106,3 +106,12 @@ def test_connection_retreives_Data_From_rds_database():
         assert isinstance(table[0], int)
         assert isinstance(table[1], str)
     close_rds(db)
+
+@patch('psycopg2.connect')
+def test_close_rds_closes_database_connection(mock_connect, caplog):
+    
+    mock_connect = connect_to_rds()
+
+    close_rds(mock_connect)
+
+    assert "Connection to RDS closed" in caplog.text

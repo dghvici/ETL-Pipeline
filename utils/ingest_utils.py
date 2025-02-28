@@ -25,8 +25,7 @@ def put_current_time(ssm, timestamp_now):
         Overwrite=True
     )
 
-
-def get_parameter(ssm, parameter_name, **kwargs):
+def retrieve_parameter(ssm, parameter_name, **kwargs):
   try:
     if parameter_name: 
       response = ssm.get_parameters(
@@ -52,7 +51,7 @@ def check_database_updated():
     ]
 
     try:
-        timestamp_prev = get_parameter(ssm, "timestamp_now")
+        timestamp_prev = retrieve_parameter(ssm, "timestamp_now")
         print(timestamp_prev, "prev")
         timestamp_now = datetime.now()
         print(timestamp_now, "now")
@@ -85,5 +84,3 @@ def check_database_updated():
         if conn:
             cur.close()
             close_rds(conn)
-
-  
