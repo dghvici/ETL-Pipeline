@@ -25,7 +25,8 @@ def test_connect_to_rds_success(mock_connect):
 
 
 @patch("psycopg2.connect")
-def test_connect_to_rds_connection_fails_operational_error(mock_connect, caplog):
+def test_connect_to_rds_connection_fails_operational_error(
+        mock_connect, caplog):
     mock_connect.side_effect = psycopg2.OperationalError("mock error")
 
     connection = connect_to_rds()
@@ -41,11 +42,14 @@ def test_connect_to_rds_connection_fails_operational_error(mock_connect, caplog)
     assert connection is None
     assert "OperationalError connecting to RDS: mock error" in caplog.text
 
-@patch("psycopg2.connect")
-def test_connect_to_rds_connection_fails_exception_error(mock_connect, caplog):
-    mock_connect.side_effect = Exception("Error connection to RDS: Connection error")
 
-    connection = connect_to_rds() 
+@patch("psycopg2.connect")
+def test_connect_to_rds_connection_fails_exception_error(
+        mock_connect, caplog):
+    mock_connect.side_effect = Exception(
+        "Error connection to RDS: Connection error")
+
+    connection = connect_to_rds()
 
     mock_connect.assert_called_once_with(
         user=os.getenv("RDS_USER"),
@@ -53,11 +57,12 @@ def test_connect_to_rds_connection_fails_exception_error(mock_connect, caplog):
         database=os.getenv("RDS_NAME"),
         host=os.getenv("RDS_HOST"),
         port=os.getenv("PORT"),
-   )
-    assert connection is None 
+    )
+    assert connection is None
     assert "Error connection to RDS: Connection error" in caplog.text
 
 # retrive 1, 'USD' from currency table
+
 
 @patch("psycopg2.connect")
 def test_search_rds(mock_connect):
@@ -87,15 +92,18 @@ def test_search_rds(mock_connect):
         database=os.getenv("RDS_NAME"),
         host=os.getenv("RDS_HOST"),
         port=os.getenv("PORT"),
-   )
-    
-    mock_cursor.execute.assert_called_once_with("SELECT * FROM currency WHERE code = %s", ('USD',))
+    )
+
+    mock_cursor.execute.assert_called_once_with(
+        "SELECT * FROM currency WHERE code = %s", ('USD',)
+        )
     mock_cursor.fetchall.assert_called_once()
     mock_connection.close.assert_called_once()
 
 
-#     # Retrieves data from currency table, validates connection through confirmation that 
-#     1) data in first column is an integer, 
+#     # Retrieves data from currency table,
+#     validates connection through confirmation that
+#     1) data in first column is an integer,
 #     2) second column is of data type of string
 # def test_connection_retreives_Data_From_rds_database():
 #     db = connect_to_rds()
