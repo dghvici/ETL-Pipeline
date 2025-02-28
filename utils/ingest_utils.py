@@ -7,36 +7,37 @@ ssm = boto3.client("ssm", "eu-west-2")
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 def put_prev_time(ssm, timestamp_prev):
     ssm.put_parameter(
         Name="timestamp_prev",
         Description="Time database was last queried",
         Value=timestamp_prev,
-        Type='String',
-        Overwrite=True
+        Type="String",
+        Overwrite=True,
     )
+
 
 def put_current_time(ssm, timestamp_now):
     ssm.put_parameter(
         Name="timestamp_now",
         Description="Time database queried",
         Value=timestamp_now,
-        Type='String',
-        Overwrite=True
+        Type="String",
+        Overwrite=True,
     )
 
+
 def retrieve_parameter(ssm, parameter_name, **kwargs):
-  try:
-    if parameter_name: 
-      response = ssm.get_parameters(
-          Names = [parameter_name]
-      )
-    return response['Parameters'][0]['Value']
-  except IndexError as error:
-    logger.error(f"Error: Name does not exist in Parameter Store")
-    raise
-  
-    
+    try:
+        if parameter_name:
+            response = ssm.get_parameters(Names=[parameter_name])
+        return response["Parameters"][0]["Value"]
+    except IndexError as error:
+        logger.error(f"Error: Name does not exist in Parameter Store")
+        raise
+
+
 def check_database_updated():
     """Function to check if the database has been updated since the last
     time it was checked. Returns a list of the updated table names
@@ -45,9 +46,17 @@ def check_database_updated():
 
     conn = None
     all_table_names = [
-        "transaction", "design", "sales_order", "address", 
-        "counterparty", "payment", "payment_type", "currency", 
-        "staff", "department", "purchase_order"
+        "transaction",
+        "design",
+        "sales_order",
+        "address",
+        "counterparty",
+        "payment",
+        "payment_type",
+        "currency",
+        "staff",
+        "department",
+        "purchase_order",
     ]
 
     try:
@@ -60,26 +69,27 @@ def check_database_updated():
         conn = connect_to_rds()
         cur = conn.cursor()
 
-
         updated_tables = []
 
         for table in all_table_names:
             query = f"""SELECT last_updated FROM {table} 
             WHERE last_updated BETWEEN '{timestamp_prev}' and '{timestamp_now}';"""
             cur.execute(query)
-            new_dates = cur.fetchall() #fetches the rows, returning them as a list of tuples
+            new_dates = (
+                cur.fetchall()
+            )  # fetches the rows, returning them as a list of tuples
             if new_dates:
                 updated_tables.append(table)
-        
+
         put_prev_time(ssm, str(timestamp_now))
-        
+
         return updated_tables
-    
+
     except IndexError as error:
-        put_prev_time(ssm, '1981-01-01 00:00:00.000')
+        put_prev_time(ssm, "1981-01-01 00:00:00.000")
         put_current_time(ssm, str(datetime.now()))
         return all_table_names
-    
+
     finally:
         if conn:
             cur.close()

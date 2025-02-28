@@ -27,21 +27,23 @@ def connect_to_rds(raise_exception=False):
         if raise_exception:
             raise
         return None
-    except Exception as error: 
+    except Exception as error:
         logger.error(f"Error connection to RDS: {error}")
         if raise_exception:
             raise
         return None
 
-#TO BE DELETED
+
+# TO BE DELETED
 ###############################################################################
+
 
 def execute_query(query, params=None):
     conn = connect_to_rds()
     if conn is None:
         logger.error("Failed to connect to RDS")
         return None
-    
+
     try:
         cursor = conn.cursor()
         cursor.execute(query, params)
@@ -51,16 +53,16 @@ def execute_query(query, params=None):
     except Exception as error:
         logger.error(f"Error executing query: {error}")
         return None
-    finally: 
+    finally:
         close_rds(conn)
+
 
 ###############################################################################
 
+
 def close_rds(conn):
-    if conn is not None: 
+    if conn is not None:
         conn.close()
         logger.info("Connection to RDS closed")
-    else: 
+    else:
         logger.error("Connection to RDS is already closed")
-   
-
