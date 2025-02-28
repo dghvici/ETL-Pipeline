@@ -94,7 +94,9 @@ def test_search_rds(mock_connect):
     mock_connection.close.assert_called_once()
 
 
-#     # Retrieves data from currency table, validates connection through confirmation that 1) data in first column is an integer, 2) second column is of data type of string
+#     # Retrieves data from currency table, validates connection through confirmation that 
+#     1) data in first column is an integer, 
+#     2) second column is of data type of string
 # def test_connection_retreives_Data_From_rds_database():
 #     db = connect_to_rds()
 
