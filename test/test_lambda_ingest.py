@@ -7,6 +7,7 @@ import boto3
 import pytest
 import os
 from utils.connection import connect_to_rds
+from unittest.mock import patch, MagicMock, Mock
 
 @pytest.fixture(scope="function", autouse=True)
 def aws_credentials():
@@ -33,21 +34,23 @@ class TestIngest():
             # resp = rdsdata.execute_statement(resourceArn="not applicable", secretArn="not applicable", sql="SELECT some FROM thing")
             assert response == "No new data."
 
-    def test_connection_ingests_all_data(self):
-        conn = connect_to_rds()
-        cur = conn.cursor()
-        query = """SELECT * FROM currency"""
-        cur.execute(query)
-        event = "event"
-        context = "context"
-        response = lambda_handler_ingest(event, context)
-        assert response == "All data has been ingested."
 
 
-        # connect to local db 
-        # NB:create local database connection
-        # ingest mock db
-        # assert result is everything in mock db
+    @patch("psycopg2.connect")
+    def test_connection_ingests_all_data(self, mock_connect):
+        expected = [('SALE', 1, 1),
+    ('PURCHASE', 2, 2),
+    ('PURCHASE', 3, 3)]
+
+        mock_con = mock_connect.return_value
+        mock_cur = mock_con.cursor.return_value
+        query = """SELECT * FROM SALES"""
+        mock_cur.fetchall.return_value = expected
+        mock_cur.execute.return_value = None
+
+        result = lambda_handler_ingest(event="event", context="context")
+        print("DEBUG: Result from function ->", result)
+        assert result == "All data has been ingested."
 
 
 
