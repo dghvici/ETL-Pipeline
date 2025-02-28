@@ -1,11 +1,11 @@
 import os
-import pytest
 from unittest.mock import patch, MagicMock
 import psycopg2
 from utils.connection import connect_to_rds, close_rds
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 @patch("psycopg2.connect")
 def test_connect_to_rds_success(mock_connect):
