@@ -1,13 +1,11 @@
 import boto3
 import json
-import os
-import psycopg2
 from dotenv import load_dotenv
 import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
 from utils.connection import connect_to_rds, close_rds
-from utils.ingest_utils import check_database_updated, retrieve_parameter, put_current_time, put_prev_time
+from utils.ingest_utils import check_database_updated, retrieve_parameter
 
 
 ssm = boto3.client("ssm", "eu-west-2")
@@ -32,8 +30,9 @@ def lambda_handler_ingest(event, context):
                 cur = conn.cursor()
                 previous_time = retrieve_parameter(ssm, "timestamp_prev")
                 current_time = retrieve_parameter(ssm, "timestamp_now")
-                query = f"""SELECT * FROM {table} 
-                        WHERE last_updated BETWEEN '{previous_time}' and '{current_time}';"""
+                query = f"""SELECT * FROM {table}
+                        WHERE last_updated BETWEEN '{previous_time}'
+                        and '{current_time}';"""
                 cur.execute(query)
                 response = cur.fetchall()
                 close_rds(conn)

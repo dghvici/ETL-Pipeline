@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import logging
 
 # load env variables
-load_dotenv() #conditional only happens if runs in test environment
+load_dotenv()  # conditional only happens if runs in test environment
 
 # configure logger
 logger = logging.getLogger()
