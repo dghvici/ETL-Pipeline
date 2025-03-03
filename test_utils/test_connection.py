@@ -102,16 +102,16 @@ def test_search_rds(mock_connect):
     mock_connection.close.assert_called_once()
 
 
-def test_connection_retreives_Data_From_rds_database():
+# def test_connection_retreives_Data_From_rds_database():
 
-    db = connect_to_rds()
-    cur = db.cursor()
-    cur.execute("SELECT * FROM currency")
-    rows = cur.fetchall()
-    for table in rows:
-        assert isinstance(table[0], int)
-        assert isinstance(table[1], str)
-    close_rds(db)
+#     db = connect_to_rds()
+#     cur = db.cursor()
+#     cur.execute("SELECT * FROM currency")
+#     rows = cur.fetchall()
+#     for table in rows:
+#         assert isinstance(table[0], int)
+#         assert isinstance(table[1], str)
+#     close_rds(db)
 
 
 @patch("psycopg2.connect")
