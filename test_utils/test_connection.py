@@ -29,7 +29,6 @@ def test_connect_to_rds_connection_fails_operational_error(
     mock_connect, caplog
 ):
     mock_connect.side_effect = psycopg2.OperationalError("mock error")
-
     connection = connect_to_rds()
 
     mock_connect.assert_called_once_with(
@@ -45,10 +44,10 @@ def test_connect_to_rds_connection_fails_operational_error(
 
 
 @patch("psycopg2.connect")
-def test_connect_to_rds_connection_fails_exception_error(mock_connect, caplog):
+def test_connect_to_rds_connection_fails_exception_error(
+        mock_connect, caplog):
     mock_connect.side_effect = Exception(
-        "Error connection to RDS: Connection error"
-    )
+        "Error connection to RDS: Connection error")
 
     connection = connect_to_rds()
 
@@ -97,19 +96,15 @@ def test_search_rds(mock_connect):
     )
 
     mock_cursor.execute.assert_called_once_with(
-        "SELECT * FROM currency WHERE code = %s", ("USD",)
-    )
+        "SELECT * FROM currency WHERE code = %s", ('USD',)
+        )
     mock_cursor.fetchall.assert_called_once()
     mock_connection.close.assert_called_once()
 
-    # Retrieves data from currency table,
-    # validates connection through confirmation that
-    # 1) data in first column is an integer,
-    # 2) second column is of data type of string
 
 
-@patch("psycopg2.connect")
-def test_connection_retreives_Data_From_rds_database(mock_connect):
+def test_connection_retreives_Data_From_rds_database():
+
     db = connect_to_rds()
     cur = db.cursor()
     cur.execute("SELECT * FROM currency")
@@ -127,3 +122,4 @@ def test_close_rds_closes_database_connection(mock_connect, caplog):
     close_rds(mock_connect)
 
     assert "Connection to RDS closed" in caplog.text
+

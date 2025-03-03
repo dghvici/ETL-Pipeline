@@ -51,10 +51,9 @@ class TestRetreieveParameter:
         ssm_client = boto3.client("ssm", "eu-west-2")
         parameter_name = "test_param"
         ssm_client.put_parameter(
-            Name=parameter_name,
-            Value="test_value",
+            Name=parameter_name, Value="test_value",
             Type="String",
-            Overwrite=True,
+            Overwrite=True
         )
         response = retrieve_parameter(ssm_client, parameter_name)
         assert response == "test_value"

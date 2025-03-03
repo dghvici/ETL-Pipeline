@@ -40,11 +40,10 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
 
 def check_database_updated():
     """Function to check if the database has been updated since the last time
-    it was checked.
-
-    Returns a list of the updated table names if the database has been updated,
-    and an empty list if there have been no updates to the database
-    """
+    it was checked."""
+    """Returns a list of the updated table
+    names if the database has been updated,
+    and an empty list if there have been no updates to the database"""
 
     conn = None
     all_table_names = [
@@ -76,7 +75,7 @@ def check_database_updated():
         for table in all_table_names:
             query = f"""SELECT last_updated FROM {table}
             WHERE last_updated BETWEEN '{timestamp_prev}'
-             and '{timestamp_now}';"""
+            and '{timestamp_now}';"""
             cur.execute(query)
             new_dates = (
                 cur.fetchall()
