@@ -39,8 +39,8 @@ def lambda_handler_ingest(event, context):
                 response_dict = {f'{table}': response_date}
                 s3_client = boto3.client("s3")
                 body = json.dumps(response_dict)
-                key = f"{datetime.year}/{datetime.month}\
-                    /ingested-{table}-{current_time}"
+                key = f"{datetime.now().year}/{datetime.now().month}\
+                /ingested-{table}-{current_time}"
                 bucket = "lullymore-west-ingested"
                 s3_client.put_object(Bucket=bucket, Key=key, Body=body)
             logger.info("All data has been ingested.")
