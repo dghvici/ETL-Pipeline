@@ -89,7 +89,9 @@ class TestIngestion:
         mock_cur = Mock()
         mock_connect_to_rds.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cur
-        mock_cur.fetchall.return_value = [{"id": 1, "data": "sample data"}]
+        mock_cur.fetchall.return_value = [
+            (1, 'PURCHASE', 1, 1, '2022-11-03 14:20:52.186', '2022-11-03 14:20:52.186'),
+            (2, 'SALE', 2, 2, '2022-11-22 17:02:10.130', '2022-11-22 17:02:10.130')]
         mock_s3_client = Mock()
         mock_boto_client.return_value = mock_s3_client
         event = {}
@@ -113,7 +115,9 @@ class TestIngestion:
         mock_cur = Mock()
         mock_connect_to_rds.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cur
-        mock_cur.fetchall.return_value = [{"id": 1, "data": "sample data"}]
+        mock_cur.fetchall.return_value = [
+            (1, 'PURCHASE', 1, 1, '2022-11-03 14:20:52.186', '2022-11-03 14:20:52.186'),
+            (2, 'SALE', 2, 2, '2022-11-22 17:02:10.130', '2022-11-22 17:02:10.130')]
         event = {}
         context = {}
         lambda_handler_ingest(event, context)

@@ -36,9 +36,13 @@ def lambda_handler_ingest(event, context):
                 cur.execute(query)
                 response = cur.fetchall()
                 close_rds(conn)
+                # response needs not be sanitized 
+                # fetch column headers 
+                # zip together thank json dump
                 s3_client = boto3.client("s3")
                 body = json.dumps(response)
-                key = f"ingested{datetime.now()}"
+                key = f"{datetime.year}/{datetime.month}\
+                    /ingested{table}{datetime.now()}"
                 bucket = "lullymore-west-ingested"
                 s3_client.put_object(Bucket=bucket, Key=key, Body=body)
             logger.info("All data has been ingested.")
