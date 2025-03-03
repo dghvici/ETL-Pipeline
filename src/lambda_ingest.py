@@ -34,15 +34,13 @@ def lambda_handler_ingest(event, context):
                         WHERE last_updated BETWEEN '{previous_time}'
                         and '{current_time}';"""
                 cur.execute(query)
-                response = cur.fetchall()
+                response_date = cur.fetchall()
                 close_rds(conn)
-                # response needs not be sanitized 
-                # fetch column headers 
-                # zip together thank json dump
+                response_dict = {f'{table}': response_date}
                 s3_client = boto3.client("s3")
-                body = json.dumps(response)
+                body = json.dumps(response_dict)
                 key = f"{datetime.year}/{datetime.month}\
-                    /ingested{table}{datetime.now()}"
+                    /ingested-{table}-{current_time}"
                 bucket = "lullymore-west-ingested"
                 s3_client.put_object(Bucket=bucket, Key=key, Body=body)
             logger.info("All data has been ingested.")
