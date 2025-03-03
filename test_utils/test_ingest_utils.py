@@ -3,10 +3,9 @@ from utils.ingest_utils import (
     put_current_time,
     retrieve_parameter,
     put_prev_time,
-    check_database_updated,
-)
+    )
 from moto import mock_aws
-from unittest.mock import patch
+# from unittest.mock import patch
 import os
 import pytest
 
