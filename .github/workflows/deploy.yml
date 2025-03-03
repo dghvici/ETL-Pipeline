@@ -58,8 +58,8 @@ jobs:
       - name: Terraform apply
         working-directory: terraform
         run: terraform apply -auto-approve \
-          -var="rds_user=${{ secrets.RDS_USER }}" \
-          -var="rds_password=${{ secrets.RDS_PASSWORD }}" \
-          -var="port=${{ secrets.PORT }}"
-          -var="rds_name"=${{ secrets.RDS_NAME }}
-          -var="rds_host"=${{ secrets.RDS_HOST }}
+        -var="rds_user=${{ secrets.RDS_USER }}" \
+        -var="rds_password=${{ secrets.RDS_PASSWORD }}" \
+        -var="port=${{ secrets.PORT }}" \
+        -var="rds_name=${{ secrets.RDS_NAME }}" \
+        -var="rds_host=${{ secrets.RDS_HOST }}"
