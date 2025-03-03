@@ -3,7 +3,6 @@ from unittest.mock import patch, MagicMock
 import psycopg2
 from utils.connection import connect_to_rds, close_rds
 from dotenv import load_dotenv
-from pprint import pprint
 
 load_dotenv()
 
@@ -27,9 +26,9 @@ def test_connect_to_rds_success(mock_connect):
 
 @patch("psycopg2.connect")
 def test_connect_to_rds_connection_fails_operational_error(
-        mock_connect, caplog):
+    mock_connect, caplog
+):
     mock_connect.side_effect = psycopg2.OperationalError("mock error")
-
     connection = connect_to_rds()
 
     mock_connect.assert_called_once_with(
@@ -45,10 +44,10 @@ def test_connect_to_rds_connection_fails_operational_error(
 
 
 @patch("psycopg2.connect")
-def test_connect_to_rds_connection_fails_exception_error(
-        mock_connect, caplog):
+def test_connect_to_rds_connection_fails_exception_error(mock_connect, caplog):
     mock_connect.side_effect = Exception(
-        "Error connection to RDS: Connection error")
+        "Error connection to RDS: Connection error"
+    )
 
     connection = connect_to_rds()
 
@@ -62,6 +61,7 @@ def test_connect_to_rds_connection_fails_exception_error(
     assert connection is None
     assert "Error connection to RDS: Connection error" in caplog.text
 
+
 # retrive 1, 'USD' from currency table
 
 
@@ -73,16 +73,16 @@ def test_search_rds(mock_connect):
     mock_connection.cursor.return_value = mock_cursor
 
     # Mock the query result
-    mock_cursor.fetchall.return_value = [(1, 'USD')]
+    mock_cursor.fetchall.return_value = [(1, "USD")]
 
     connection = connect_to_rds()
     assert connection is not None
 
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM currency WHERE code = %s", ('USD',))
+    cursor.execute("SELECT * FROM currency WHERE code = %s", ("USD",))
     results = cursor.fetchall()
 
-    assert results == [(1, 'USD')]
+    assert results == [(1, "USD")]
 
     cursor.close()
     close_rds(connection)
@@ -96,8 +96,8 @@ def test_search_rds(mock_connect):
     )
 
     mock_cursor.execute.assert_called_once_with(
-        "SELECT * FROM currency WHERE code = %s", ('USD',)
-        )
+        "SELECT * FROM currency WHERE code = %s", ("USD",)
+    )
     mock_cursor.fetchall.assert_called_once()
     mock_connection.close.assert_called_once()
 
