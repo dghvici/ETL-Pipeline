@@ -31,6 +31,11 @@ endef
 # Build the environment requirements
 requirements: create-environment
 	$(call execute_in_env, $(PIP) install -r ./requirements.txt)
+	$(call execute_in_env, $(PIP) install -r ./requirements_lambda.txt -t modules/python)
+# $(call execute_in_env, $(PIP) install \
+	git+https://github.com/jkehler/awslambda-psycopg2@master#egg=psycopg2-3.11 -t modules/python)
+#need to install the pycopg2 packages from github to get the aws lambda working:
+#https://github.com/jkehler/awslambda-psycopg2/tree/master/psycopg2-3.11
 
 # Run the security test (bandit)
 security-test:

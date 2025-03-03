@@ -21,7 +21,7 @@ def connect_to_rds(raise_exception=False):
             port=os.getenv("PORT"),
         )
         logger.info("Successfully connected to RDS")
-        logger.info(f"{os.getenv("RDS_NAME")}")
+        logger.info(os.getenv("RDS_NAME"))
         return connection
     except psycopg2.OperationalError as op_error:
         logger.error(f"OperationalError connecting to RDS: {op_error}")
