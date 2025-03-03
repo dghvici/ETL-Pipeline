@@ -33,18 +33,17 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
         if parameter_name:
             response = ssm.get_parameters(Names=[parameter_name])
         return response["Parameters"][0]["Value"]
-    except IndexError as error:
-        logger.error(f"Error: Name does not exist in Parameter Store")
+    except IndexError:
+        logger.error("Error: Name does not exist in Parameter Store")
         raise
 
 
 def check_database_updated():
     """Function to check if the database has been updated since the last time
-    it was checked.
-
-    Returns a list of the updated table names if the database has been updated,
-    and an empty list if there have been no updates to the database
-    """
+    it was checked."""
+    """Returns a list of the updated table
+    names if the database has been updated,
+    and an empty list if there have been no updates to the database"""
 
     conn = None
     all_table_names = [
@@ -74,8 +73,9 @@ def check_database_updated():
         updated_tables = []
 
         for table in all_table_names:
-            query = f"""SELECT last_updated FROM {table} 
-            WHERE last_updated BETWEEN '{timestamp_prev}' and '{timestamp_now}';"""
+            query = f"""SELECT last_updated FROM {table}
+            WHERE last_updated BETWEEN '{timestamp_prev}'
+            and '{timestamp_now}';"""
             cur.execute(query)
             new_dates = (
                 cur.fetchall()
@@ -87,7 +87,7 @@ def check_database_updated():
 
         return updated_tables
 
-    except IndexError as error:
+    except IndexError:
         put_prev_time(ssm, "1981-01-01 00:00:00.000")
         put_current_time(ssm, str(datetime.now()))
         return all_table_names

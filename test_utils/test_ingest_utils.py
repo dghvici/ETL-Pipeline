@@ -1,7 +1,4 @@
-from datetime import datetime
 import boto3
-import logging
-import utils.ingest_utils
 from utils.ingest_utils import (
     put_current_time,
     retrieve_parameter,
@@ -9,7 +6,7 @@ from utils.ingest_utils import (
     check_database_updated,
 )
 from moto import mock_aws
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import os
 import pytest
 
@@ -54,7 +51,9 @@ class TestRetreieveParameter:
         ssm_client = boto3.client("ssm", "eu-west-2")
         parameter_name = "test_param"
         ssm_client.put_parameter(
-            Name=parameter_name, Value="test_value", Type="String", Overwrite=True
+            Name=parameter_name, Value="test_value",
+            Type="String",
+            Overwrite=True
         )
         response = retrieve_parameter(ssm_client, parameter_name)
         assert response == "test_value"
