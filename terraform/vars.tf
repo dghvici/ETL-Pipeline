@@ -25,6 +25,42 @@ variable "state_machine_name" {
   default = "Terrific-Totes-SNS"
 }
 
+#SecretManager secrets variables
+variable "rds_user" {
+  description = "The rds_user"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "rds_password" {
+  description = "The rds_password"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "rds_host" {
+  description = "The rds_host"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "port" {
+  description = "The rds port number"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "rds_name" {
+  description = "The rds name"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # variable "S3_BUCKET_PREFIX" {
 #   type = string
 # }
