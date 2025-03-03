@@ -36,7 +36,7 @@ def lambda_handler_ingest(event, context):
                 cur.execute(query)
                 response_date = cur.fetchall()
                 close_rds(conn)
-                response_dict = {f'{table}': response_date}
+                response_dict = {f"{table}": response_date}
                 s3_client = boto3.client("s3")
                 body = json.dumps(response_dict)
                 key = f"{datetime.now().year}/{datetime.now().month}\
