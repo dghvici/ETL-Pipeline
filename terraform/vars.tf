@@ -2,17 +2,17 @@
 
 variable "ingest_lambda" {
   type    = string
-  default = "ingest"
+  default = "Ingest-Lambda"
 }
 
 variable "transform_lambda" {
   type    = string
-  default = "transform"
+  default = "Transform-Lambda"
 }
 
 variable "load_lambda" {
   type    = string
-  default = "load"
+  default = "Load-Lambda"
 }
 
 variable "default_timeout" {
@@ -22,9 +22,9 @@ variable "default_timeout" {
 
 variable "state_machine_name" {
   type    = string
-  default = "terrific-totes-"
+  default = "Terrific-Totes-SNS"
 }
 
-variable "S3_BUCKET_PREFIX" {
-  type = string
-}
+# variable "S3_BUCKET_PREFIX" {
+#   type = string
+# }

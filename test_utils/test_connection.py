@@ -43,10 +43,13 @@ def test_connect_to_rds_connection_fails_operational_error(
 
 
 @patch("psycopg2.connect")
-def test_connect_to_rds_connection_fails_exception_error(mock_connect, caplog):
+def test_connect_to_rds_connection_fails_exception_error(
+        mock_connect, caplog):
     mock_connect.side_effect = Exception(
         "Error connection to RDS: Connection error")
+
     connection = connect_to_rds()
+
     mock_connect.assert_called_once_with(
         user=os.getenv("RDS_USER"),
         password=os.getenv("RDS_PASSWORD"),
@@ -92,10 +95,11 @@ def test_search_rds(mock_connect):
     )
 
     mock_cursor.execute.assert_called_once_with(
-        "SELECT * FROM currency WHERE code = %s", ("USD",)
-    )
+        "SELECT * FROM currency WHERE code = %s", ('USD',)
+        )
     mock_cursor.fetchall.assert_called_once()
     mock_connection.close.assert_called_once()
+
 
 
 def test_connection_retreives_Data_From_rds_database():
@@ -117,3 +121,4 @@ def test_close_rds_closes_database_connection(mock_connect, caplog):
     close_rds(mock_connect)
 
     assert "Connection to RDS closed" in caplog.text
+
