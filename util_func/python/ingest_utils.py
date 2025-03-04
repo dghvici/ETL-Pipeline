@@ -1,7 +1,7 @@
 import boto3
 from datetime import datetime
 import logging
-from utils.connection import connect_to_rds, close_rds
+from connection import connect_to_rds, close_rds
 
 ssm = boto3.client("ssm", "eu-west-2")
 logger = logging.getLogger()

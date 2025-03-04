@@ -43,7 +43,7 @@ requirements: create-environment
 # Run the security test (bandit)
 security-test:
 	$(call execute_in_env, bandit -lll ./src/*.py ./test/*.py \
-	./utils/*.py ./test_utils/*.py)
+	./util_func/*.py ./test_utils/*.py)
 
 # Run pip-audit test
 audit-test:
@@ -52,18 +52,18 @@ audit-test:
 # Run the black code check
 run-black:
 	$(call execute_in_env, black --line-length 79 ./src/*.py ./test/*.py \
-	./utils/*.py ./test_utils/*.py)
+	./util_func/*/*.py ./test_utils/*.py)
 
 # Run docformatter
 run-docformatter:
 	$(call execute_in_env, docformatter --in-place --wrap-summaries \
 	79 --wrap-descriptions 79 ./src/*.py ./test/*.py \
-	./utils/*.py ./test_utils/*.py)
+	./util_func/*/*.py ./test_utils/*.py)
 
 # Run flake8
 run-flake8:
 	$(call execute_in_env, flake8 ./src/*.py ./test/*.py \
-	./utils/*.py ./test_utils/*.py)
+	./util_func/*/*.py ./test_utils/*.py)
 
 # Run the unit tests
 unit-test:
@@ -72,7 +72,7 @@ unit-test:
 # Run the coverage check
 check-coverage:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=src test/)
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=utils test_utils/)
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=util_func test_utils/)
 
 # Run security tests
 run-security: security-test audit-test

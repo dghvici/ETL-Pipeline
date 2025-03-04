@@ -4,8 +4,12 @@ from dotenv import load_dotenv
 import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
-from utils.connection import connect_to_rds, close_rds
-from utils.ingest_utils import check_database_updated, retrieve_parameter
+
+from connection import connect_to_rds, close_rds
+from ingest_utils import (
+    check_database_updated,
+    retrieve_parameter,
+)
 
 
 ssm = boto3.client("ssm", "eu-west-2")

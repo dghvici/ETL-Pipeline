@@ -28,3 +28,4 @@ modules/
 packages/.terraform/
 packages/
 packages
+awslambda-psycopg2

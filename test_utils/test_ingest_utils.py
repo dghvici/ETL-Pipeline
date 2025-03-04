@@ -1,5 +1,5 @@
 import boto3
-from utils.ingest_utils import (
+from util_func.python.ingest_utils import (
     put_current_time,
     retrieve_parameter,
     put_prev_time,
@@ -68,7 +68,10 @@ class TestRetreieveParameter:
 
 
 class TestCheckDatabaseUpdated:
-    @patch("utils.ingest_utils.retrieve_parameter", side_effect=IndexError)
+    @patch(
+        "util_func.python.ingest_utils.retrieve_parameter",
+        side_effect=IndexError,
+    )
     def test_check_db_updated_returns_all_tables_on_first_invokation(
         self, mock_retrieve_parameter
     ):

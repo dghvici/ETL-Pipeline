@@ -2,7 +2,7 @@
 
 
 resource "aws_s3_bucket" "ingestion_bucket" {
-  bucket = "lullymore-west-ingested"
+  bucket_prefix  = "lullymore-west-ingested"
   tags = {
     Name = "BucketForDataIngestion"
   }
@@ -11,7 +11,7 @@ resource "aws_s3_bucket" "ingestion_bucket" {
 
 resource "aws_s3_bucket" "transform_bucket" {
 
-  bucket = "lullymore-west-transformed"
+  bucket_prefix = "lullymore-west-transformed"
   tags = {
     Name = "BucketForDataTransformation"
   }
