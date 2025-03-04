@@ -25,11 +25,6 @@ jobs:
         run: make run-security
       - name: Run formatter and tests
         run: make run-checks
-
-  #s3 files should never be destroyed once created and 
-  #application has been deployed...
-  #potentially store s3 terraform in a different working directory
-  #(terraform_s3)?? But does this link up everything correctly?
   deploy-terraform:
     name: deploy-terraform
     runs-on: ubuntu-latest
