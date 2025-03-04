@@ -33,23 +33,40 @@ jobs:
   deploy-terraform:
     name: deploy-terraform
     runs-on: ubuntu-latest
-    environment: dev
     needs: run-tests
+    strategy: 
+      matrix:
+        environment: [development, production]
     steps:
       - name: checkout and clone repo
         uses: actions/checkout@v4
-      - name: setup Terraform
-        uses: hashicorp/setup-terraform@v3
-      - name: setup AWS credentials
+
+      - name: setup Python
+        uses: actions/setup-python@v5
+        with: 
+          python-version: '3.12.7'
+      
+      - name: Create environment
+        uses: make requirements 
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with: 
+          terraform_version: 1.0.11
+      
       - name: Terraform init
         working-directory: terraform
         run: terraform init
-      - name: Terraform plan
+
+      - name: Terraform Plan (Development)
+        if: matrix.environment == 'development'
         working-directory: terraform
         run: terraform plan
         env:
@@ -58,16 +75,60 @@ jobs:
           TF_VAR_port: ${{ secrets.PORT }}
           TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
           TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
-      - name: Terraform format
+      
+      - name: Terraform Apply (Development)
+        if: matrix.envrionment == 'development'
         working-directory: terraform
-        run: terraform fmt
-      - name: Terraform apply
-        working-directory: terraform
-        run: terraform apply -auto-approve -input=false 
+        run: terraform apply 
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
           TF_VAR_port: ${{ secrets.PORT }}
           TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
           TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
+
+      - name: Terraform Apply (Production)
+        if: matrix.envrionment == 'production'
+        working-directory: terraform
+        run: terraform apply 
+        env:
+          TF_VAR_rds_user: ${{ secrets.RDS_USER }}
+          TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+          TF_VAR_port: ${{ secrets.PORT }}
+          TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
+          TF_VAR_rds_host: ${{ secrets.RDS_HOST }}      
+
+
+
+
+      # - name: setup AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-region: ${{ secrets.AWS_REGION }}
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Terraform init
+      #   working-directory: terraform
+      #   run: terraform init
+      # - name: Terraform plan
+      #   working-directory: terraform
+      #   run: terraform plan
+      #   env:
+      #     TF_VAR_rds_user: ${{ secrets.RDS_USER }}
+      #     TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+      #     TF_VAR_port: ${{ secrets.PORT }}
+      #     TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
+      #     TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
+      # - name: Terraform format
+      #   working-directory: terraform
+      #   run: terraform fmt
+      # - name: Terraform apply
+      #   working-directory: terraform
+      #   run: terraform apply -auto-approve -input=false 
+      #   env:
+      #     TF_VAR_rds_user: ${{ secrets.RDS_USER }}
+      #     TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+      #     TF_VAR_port: ${{ secrets.PORT }}
+      #     TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
+      #     TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       
