@@ -62,7 +62,7 @@ jobs:
       - name: Terraform Plan (Development)
         if: matrix.environment == 'development'
         working-directory: terraform
-        run: terraform plan
+        run: terraform plan -auto-approve
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
@@ -72,7 +72,7 @@ jobs:
       - name: Terraform Apply (Development)
         if: matrix.environment == 'development'
         working-directory: terraform
-        run: terraform apply 
+        run: terraform apply -auto-approve
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
@@ -82,7 +82,7 @@ jobs:
       - name: Terraform Apply (Production)
         if: matrix.environment == 'production'
         working-directory: terraform
-        run: terraform apply 
+        run: terraform apply -auto-approve
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
