@@ -31,6 +31,11 @@ resource "aws_lambda_function" "ingest_function" {
   source_code_hash = data.archive_file.ingest_lambda.output_base64sha512
   environment {
     variables = {
+      RDS_USER        = var.rds_user
+      RDS_PASSWORD    = var.rds_password
+      RDS_NAME        = var.rds_name
+      RDS_HOST        = var.rds_host
+      PORT            = var.port
       S3_BUCKET_NAME = aws_s3_bucket.ingestion_bucket.bucket
       
     }
