@@ -31,7 +31,7 @@ jobs:
     needs: run-tests
     strategy: 
       matrix:
-        environment: [development, production]
+        environment: development
     steps:
       - name: checkout and clone repo
         uses: actions/checkout@v4
