@@ -52,15 +52,22 @@ jobs:
       - name: Terraform plan
         working-directory: terraform
         run: terraform plan
+        env:
+          TF_VAR_rds_user: ${{ secrets.RDS_USER }}
+          TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+          TF_VAR_port: ${{ secrets.PORT }}
+          TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
+          TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       - name: Terraform format
         working-directory: terraform
         run: terraform fmt
       - name: Terraform apply
         working-directory: terraform
-        run: terraform apply -auto-approve -input=false \
-          -var='rds_user=${{ secrets.RDS_USER }}' \
-          -var='rds_password=${{ secrets.RDS_PASSWORD }}' \
-          -var='port=${{ secrets.PORT }}' \
-          -var='rds_name=${{ secrets.RDS_NAME }}' \
-          -var='rds_host=${{ secrets.RDS_HOST }}'
+        run: terraform apply -auto-approve -input=false 
+          env:
+          TF_VAR_rds_user: ${{ secrets.RDS_USER }}
+          TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+          TF_VAR_port: ${{ secrets.PORT }}
+          TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
+          TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       
