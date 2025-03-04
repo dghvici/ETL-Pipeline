@@ -32,6 +32,7 @@ resource "aws_lambda_function" "ingest_function" {
   environment {
     variables = {
       S3_BUCKET_NAME = aws_s3_bucket.ingestion_bucket.bucket
+      
     }
   }
 }
