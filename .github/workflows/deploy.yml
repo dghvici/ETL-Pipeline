@@ -45,7 +45,7 @@ jobs:
         with: 
           python-version: '3.12.7'
       - name: Create environment
-        uses: make requirements 
+        run: make requirements 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -70,7 +70,7 @@ jobs:
           TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
           TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       - name: Terraform Apply (Development)
-        if: matrix.envrionment == 'development'
+        if: matrix.environment == 'development'
         working-directory: terraform
         run: terraform apply 
         env:
@@ -80,7 +80,7 @@ jobs:
           TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
           TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       - name: Terraform Apply (Production)
-        if: matrix.envrionment == 'production'
+        if: matrix.environment == 'production'
         working-directory: terraform
         run: terraform apply 
         env:
