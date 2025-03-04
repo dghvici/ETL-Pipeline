@@ -102,17 +102,22 @@ def test_search_rds(mock_connect):
     mock_connection.close.assert_called_once()
 
 
-#     # Retrieves data from currency table,
-#     validates connection through confirmation that
-#     1) data in first column is an integer,
-#     2) second column is of data type of string
 # def test_connection_retreives_Data_From_rds_database():
-#     db = connect_to_rds()
 
+#     db = connect_to_rds()
 #     cur = db.cursor()
-#     reponse = cur.execute("SELECT * FROM currency")
+#     cur.execute("SELECT * FROM currency")
 #     rows = cur.fetchall()
 #     for table in rows:
 #         assert isinstance(table[0], int)
 #         assert isinstance(table[1], str)
 #     close_rds(db)
+
+
+@patch("psycopg2.connect")
+def test_close_rds_closes_database_connection(mock_connect, caplog):
+    mock_connect = connect_to_rds()
+
+    close_rds(mock_connect)
+
+    assert "Connection to RDS closed" in caplog.text

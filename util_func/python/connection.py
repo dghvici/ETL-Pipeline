@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import logging
 
 # load env variables
-load_dotenv()  # conditional only happens if runs in test environment
+load_dotenv()
 
 # configure logger
 logger = logging.getLogger()
@@ -21,49 +21,46 @@ def connect_to_rds(raise_exception=False):
             port=os.getenv("PORT"),
         )
         logger.info("Successfully connected to RDS")
-        logger.info(os.getenv("RDS_NAME"))
+        logger.info(f"{os.getenv("RDS_NAME")}")
         return connection
     except psycopg2.OperationalError as op_error:
         logger.error(f"OperationalError connecting to RDS: {op_error}")
         if raise_exception:
             raise
         return None
-    except Exception as error:
+    except Exception as error: 
         logger.error(f"Error connection to RDS: {error}")
         if raise_exception:
             raise
         return None
 
-
-# TO BE DELETED
 ###############################################################################
 
-
-# def execute_query(query, params=None):
-#     conn = connect_to_rds()
-#     if conn is None:
-#         logger.error("Failed to connect to RDS")
-#         return None
-
-#     try:
-#         cursor = conn.cursor()
-#         cursor.execute(query, params)
-#         results = cursor.fetchall()
-#         cursor.close()
-#         return results
-#     except Exception as error:
-#         logger.error(f"Error executing query: {error}")
-#         return None
-#     finally:
-#         close_rds(conn)
-
+def execute_query(query, params=None):
+    conn = connect_to_rds()
+    if conn is None:
+        logger.error("Failed to connect to RDS")
+        return None
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
+    except Exception as error:
+        logger.error(f"Error executing query: {error}")
+        return None
+    finally: 
+        close_rds(conn)
 
 ###############################################################################
-
 
 def close_rds(conn):
-    if conn is not None:
+    if conn is not None: 
         conn.close()
         logger.info("Connection to RDS closed")
-    else:
+    else: 
         logger.error("Connection to RDS is already closed")
+   
+
