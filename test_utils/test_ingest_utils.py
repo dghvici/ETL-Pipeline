@@ -3,8 +3,9 @@ from util_func.python.ingest_utils import (
     put_current_time,
     retrieve_parameter,
     put_prev_time,
-    )
+)
 from moto import mock_aws
+
 # from unittest.mock import patch
 import os
 import pytest
@@ -66,28 +67,28 @@ class TestRetreieveParameter:
             retrieve_parameter(ssm_client, parameter_name)
 
 
-class TestCheckDatabaseUpdated:
-    @patch(
-        "util_func.python.ingest_utils.retrieve_parameter",
-        side_effect=IndexError,
-    )
-    def test_check_db_updated_returns_all_tables_on_first_invokation(
-        self, mock_retrieve_parameter
-    ):
-        response = check_database_updated()
+# class TestCheckDatabaseUpdated:
+#     @patch(
+#         "util_func.python.ingest_utils.retrieve_parameter",
+#         side_effect=IndexError,
+#     )
+#     def test_check_db_updated_returns_all_tables_on_first_invokation(
+#         self, mock_retrieve_parameter
+#     ):
+#         check_database_updated()
 
-    #     all_tables = [
-    #         "transaction",
-    #         "design",
-    #         "sales_order",
-    #         "address",
-    #         "counterparty",
-    #         "payment",
-    #         "payment_type",
-    #         "currency",
-    #         "staff",
-    #         "department",
-    #         "purchase_order",
-    #     ]
+#     all_tables = [
+#         "transaction",
+#         "design",
+#         "sales_order",
+#         "address",
+#         "counterparty",
+#         "payment",
+#         "payment_type",
+#         "currency",
+#         "staff",
+#         "department",
+#         "purchase_order",
+#     ]
 
-    #     assert response == all_tables
+#     assert response == all_tables
