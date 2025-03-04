@@ -55,7 +55,6 @@ jobs:
         working-directory: terraform
         run: terraform init
       - name: Terraform Plan (Development)
-        if: matrix.environment == 'development'
         working-directory: terraform
         run: terraform plan 
         env:
@@ -65,7 +64,6 @@ jobs:
           TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
           TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       - name: Terraform Apply (Development)
-        if: matrix.environment == 'development'
         working-directory: terraform
         run: terraform apply -auto-approve
         env:
@@ -75,7 +73,6 @@ jobs:
           TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
           TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       - name: Terraform Apply (Production)
-        if: matrix.environment == 'production'
         working-directory: terraform
         run: terraform apply -auto-approve
         env:
