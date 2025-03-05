@@ -50,6 +50,7 @@ resource "aws_iam_policy" "cloudwatch_policy" {
 }
 
 
+
 # IAM Role
 resource "aws_iam_role" "cloudwatch_role" {
     name               = "Cloud-Watch-Role"
