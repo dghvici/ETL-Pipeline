@@ -90,6 +90,7 @@ data "archive_file" "utils_layer" {
   output_file_mode = "0666"
   output_path = "${path.module}/../packages/layers/utils.zip"
   source_dir = "${path.module}/../util_func/"
+  
 }
 
 resource "aws_lambda_layer_version" "utils_layer" {
