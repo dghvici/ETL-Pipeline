@@ -1,11 +1,14 @@
-# import os
+import os
 # import sys
 import boto3
 import json
 from dotenv import load_dotenv
 import logging
+import pytz
 from datetime import datetime
+import pymysql 
 from botocore.exceptions import ClientError
+from util_func.connection import connect_to_rds, close_rds
 
 
 # Set this environment variable before running the script locally
@@ -13,11 +16,11 @@ from botocore.exceptions import ClientError
 
 # if os.getenv("ENV") == "development":
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from connection import connect_to_rds, close_rds
-from ingest_utils import (
-    check_database_updated,
-    retrieve_parameter,
-)
+# from connection import connect_to_rds, close_rds
+# from ingest_utils import (
+#     check_database_updated,
+#     retrieve_parameter,
+# )
 # else:
 #     sys.path.append(
 #         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +31,7 @@ from ingest_utils import (
 #         retrieve_parameter,
 #     )
 
-ssm=boto3.client("ssm", "eu-west-2")
+# ssm=boto3.client("ssm", "eu-west-2")
 
 # load env variables
 load_dotenv()  # conditional only happens if runs in test environment
@@ -39,36 +42,127 @@ logger.setLevel(logging.INFO)
 
 
 # trigered by the state machine every 30min
-def lambda_handler_ingest(event, context):
-    conn = connect_to_rds()
-    cur = conn.cursor()
-    previous_time = retrieve_parameter(ssm, "timestamp_prev")
-    current_time = retrieve_parameter(ssm, "timestamp_now")
+# def lambda_handler_ingest(event, context):
+#     conn = connect_to_rds()
+#     cur = conn.cursor()
+#     previous_time = retrieve_parameter(ssm, "timestamp_prev")
+#     current_time = retrieve_parameter(ssm, "timestamp_now")
+#     try:
+#         updated_data_tables = check_database_updated()
+#         if updated_data_tables == []:
+#             logger.info("No new data.")
+#         else:
+#             for table in updated_data_tables:
+#                 query = f"""SELECT * FROM {table}
+#                         WHERE last_updated BETWEEN '{previous_time}'
+#                         and '{current_time}';"""
+#                 cur.execute(query)
+#                 response_date = cur.fetchall()
+#                 response_dict = {f"{table}": response_date}
+#                 s3_client = boto3.client("s3")
+#                 body = json.dumps(response_dict)
+#                 key = f"{datetime.now().year}/{datetime.now().month}\
+#                 /ingested-{table}-{current_time}"
+#                 bucket = "etl-lullymore-west-ingested"
+#                 s3_client.put_object(Bucket=bucket, Key=key, Body=body)
+#             logger.info("All data has been ingested.")
+#     except ClientError as e:
+#         logger.error(f"ClientError: {str(e)}")
+#         raise Exception("Error interacting with AWS services") from e
+#     except Exception as e:
+#         logger.error(f"Unexpected error: {str(e)}")
+#         raise Exception("An unexpected error occurred") from e
+#     finally:
+#         close_rds(conn)
+
+
+# secrets manager, get_imported_timestamp and set_timestamp to go into utils folder
+
+ # database connection from secrets manager
+
+ # Initialize Boto3 clients
+secretsmanager = boto3.client("secretsmanager", "eu-west-2")
+ssm = boto3.client("ssm", "eu-west-2")
+s3_client = boto3.client("s3")
+
+def find_secret(secret_name):
     try:
-        updated_data_tables = check_database_updated()
-        if updated_data_tables == []:
-            logger.info("No new data.")
-        else:
-            for table in updated_data_tables:
-                query = f"""SELECT * FROM {table}
-                        WHERE last_updated BETWEEN '{previous_time}'
-                        and '{current_time}';"""
-                cur.execute(query)
-                response_date = cur.fetchall()
-                response_dict = {f"{table}": response_date}
-                s3_client = boto3.client("s3")
-                body = json.dumps(response_dict)
-                key = f"{datetime.now().year}/{datetime.now().month}\
-                /ingested-{table}-{current_time}"
-                bucket = "etl-lullymore-west-ingested"
-                s3_client.put_object(Bucket=bucket, Key=key, Body=body)
-            logger.info("All data has been ingested.")
+        response = secretsmanager.find_secret_value(SecretId=secret_name)
+        return json.loads(response["SecretString"])
     except ClientError as e:
-        logger.error(f"ClientError: {str(e)}")
-        raise Exception("Error interacting with AWS services") from e
-    except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        raise Exception("An unexpected error occurred") from e
-    finally:
+        logger.error(f"Error retrieving secret {secret_name}: {e}")
+        raise e
+
+def get_last_imported_timestamp(): 
+    try: 
+        response = ssm.get_parameter(Name="LastImportedTimeStamp")
+        return response["Parameter"]["Value"]
+    except ssm.exceptions.ParameterNotFound:
+        return None
+    except ClientError as e: 
+        logger.error(f"Error retriving the previous timestamp: {e}")
+        raise e 
+    
+def set_last_imported_timestamp(timestamp): 
+    try: 
+        ssm.put_parameter(
+            Name="LastImportedTimeStamp",
+            Value=timestamp,
+            Type="String",
+            Overwrite=True
+        )
+    except ClientError as e: 
+        logger.error(f"Error setting LastImportedTimeStamp: {e}")
+        raise e
+
+def lambda_handler_ingest(event, context):
+    try:
+         # rds connection
+        conn = connect_to_rds()
+        cur = conn.cursor()
+
+        # get last timestamp updates
+        last_imported_timestamp = get_last_imported_timestamp()
+        if last_imported_timestamp:
+            # Incremental import: Import only new data
+            fact_query = f"SELECT * FROM fact_table WHERE updated_at > '{last_imported_timestamp}'"
+            # other tables to go here
+
+        # inital download 
+        else: 
+            fact_query = f"SELECT * FROM fact_table;"
+        
+        cur.execute(fact_query)
+        fact_data = cur.fetchall()
+
+        # logger 
+        logger.info(f"")
+
+        # Upload data to S3
+        current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        for table, data in [("fact_table", fact_data)]:
+            body = json.dumps(data)
+            key = f"{datetime.now().year}/{datetime.now().month}/ingested-{table}-{current_time}.json"
+            bucket = "etl-lullymore-west-ingested"
+            s3_client.put_object(Bucket=bucket, Key=key, Body=body)
+
+        # Get current time in UK time zone
+        uk_timezone = pytz.timezone("Europe/London")
+        uk_time = datetime.now(uk_timezone)
+        current_timestamp = uk_time.strftime('%Y-%m-%d %H:%M:%S')
+        # update the last importtimestamp 
+        set_last_imported_timestamp(current_timestamp)
+
+        # close rds 
         close_rds(conn)
 
+        # return status code 
+        return {
+            'statusCode': 200,
+            'body': json.dumps("Data retrieved successfully")
+        }
+    except ClientError as e: 
+        logger.error(f"ClientError: {e}")
+        return {
+            'statusCode': 500
+        }
