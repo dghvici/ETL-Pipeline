@@ -132,13 +132,6 @@ def lambda_handler_ingest(event, context):
             bucket = "etl-lullymore-west-ingested"
             s3_client.put_object(Bucket=bucket, Key=key, Body=body)
 
-        # Get current time in UK time zone
-        uk_timezone = pytz.timezone("Europe/London")
-        uk_time = datetime.now(uk_timezone)
-        current_timestamp = uk_time.strftime('%Y-%m-%d %H:%M:%S')
-        # update the last importtimestamp 
-        set_last_imported_timestamp(current_timestamp)
-
         # close rds 
         close_rds(conn)
 

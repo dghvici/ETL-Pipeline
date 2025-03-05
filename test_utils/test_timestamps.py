@@ -31,3 +31,12 @@ class TestUtilTimestampError:
         mock_get_parameter.side_effect = Exception("Error")
         with pytest.raises(Exception):
             get_last_imported_timestamp()
+
+    @patch("util_func.python.timestamps.ssm.put_parameter")
+    def test_set_last_imported_timestamp_error(self, mock_put_parameter):
+        mock_put_parameter.side_effect = Exception("Error")
+        with pytest.raises(Exception):
+            set_last_imported_timestamp("2003-12-01")
+
+           
+    
