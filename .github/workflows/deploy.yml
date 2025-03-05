@@ -90,7 +90,9 @@ jobs:
           TF_VAR_port: ${{ secrets.PORT }}
           TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
           TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
-   
+      - name: Deploy Ingest Lambda function 
+        run: | 
+          aws lambda update-function-code --fuction-name LambdaFunction --s3-bucket ingestion_bucket-${{ matrix.environment }} 
 
       # - name: setup AWS credentials
       #   uses: aws-actions/configure-aws-credentials@v4
