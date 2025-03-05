@@ -12,3 +12,4 @@ dotenv==0.9.9
 psycopg2-binary==2.9.10
 psycopg2==2.9.10
 botocore==1.37.2
+sqlalchemy==2.0.38
