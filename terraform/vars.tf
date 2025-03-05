@@ -61,10 +61,10 @@ variable "rds_name" {
   default     = "default"
 }
 
-variable "environment" {
-  description = "The environment (development or production)"
-  type        = string
-}
+# variable "environment" {
+#   description = "The environment (development or production)"
+#   type        = string
+# }
 
 # variable "S3_BUCKET_PREFIX" {
 #   type = string
