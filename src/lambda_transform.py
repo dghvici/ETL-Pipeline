@@ -38,40 +38,76 @@ def lambda_handler_transform(event, context):
             elif table_name == 'address':
                 df_address = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
 
-        query_fact_sales_order = '''
-                  CREATE TABLE fact_sales_order
-                    (
-                    sales_record_id SERIAL PRIMARY KEY,
-                    sales_order_id INT,
-                    created_date DATE,
-                    created_time TIME,
-                    last_updated_date DATE,
-                    last_updated_TIME,
-                    sales_staff_id INT,
-                    counterparty_id INT,
-                    units_sold INT,
-                    unit_price NUMERIC,
-                    currency_id INT,
-                    design_id INT,
-                    agreed_payment_date DATE,
-                    agreed_delivery_date DATE,
-                    agreed_delivery_location_id INT
-                    );
-                    INSERT INTO fact_sales_order
-                    (sales_order_id, created_date, created_time, last_updated_date, last_updated, sales_staff_id, counterparty_id,
-                    units_sold, unit_price, currency_id, design_id, agreed_payment_date, agreed_delivery_date, agreed_delivery_location_id)
-                    SELECT
-                        sa.sales_order_id,
-                        DATE(sa.created_at) AS created_date,
-                        TIME(sa.created_at) AS created_time,
-                        DATE(sa.last_updated) AS last_updated_date,
-                        TIME(sa.last_updated) AS last_updated_time,
-                        sa.staff_id AS sales_staff_id,
-                    FROM
-                        sales_order AS sa
-                        '''
-        
-     #   INSERT INTO client_summary (client, quantity, total) SELECT client, SUM(quantity) AS quantity, SUM(total) AS totalFROM enriched_fact_table GROUP BY client;
+        df_sales_order['created_at'] = pd.to_datetime(df_sales_order['created_at'])
+        df_sales_order['last_updated'] = pd.to_datetime(df_sales_order['last_updated'])
+        df_sales_order['agreed_payment_date'] = pd.to_datetime(df_sales_order['agreed_payment_date'])
+        df_sales_order['agreed_delivery_date'] = pd.to_datetime(df_sales_order['agreed_delivery_date'])
+        df_fact_sales_order = pd.DataFrame()
+        df_fact_sales_order['sales_records_id'] = range(1, len(df_fact_sales_order) + 1)
+        df_fact_sales_order['sales_order_id'] = df_sales_order['sales_order_id']
+        df_fact_sales_order['created_date'] = df_sales_order['created_at'].dt.date
+        df_fact_sales_order['created_time'] = df_sales_order['created_at'].dt.time
+        df_fact_sales_order['last_updated_date'] = df_sales_order['last_updated'].dt.date
+        df_fact_sales_order['last_updated_time'] = df_sales_order['last_updated'].dt.time
+        df_fact_sales_order['sales_staff_id'] = df_sales_order['staff_id']
+        df_fact_sales_order['counterparty_id'] = df_sales_order['counterparty_id']
+        df_fact_sales_order['units_sold'] = df_sales_order['units_sold']
+        df_fact_sales_order['unit_price'] = df_sales_order['unit price']
+        df_fact_sales_order['currency_id'] = df_sales_order['currency_id']
+        df_fact_sales_order['design_id'] = df_sales_order['design_id']
+        df_fact_sales_order['agreed_payment_date'] = df_sales_order['agreed_payment_date']
+        df_fact_sales_order['agreed_delivery_date'] = df_sales_order['agreed_delivery_date']
+        df_fact_sales_order['agreed_delivery_location_id'] = df_sales_order['agreed_delivery_location_id']
+
+
+        df_dim_staff = pd.DataFrame()
+        df_dim_staff['staff_id'] = df_fact_sales_order['sales_staff_id']
+        df_dim_staff['first_name'] = df_staff['first_name']
+        df_dim_staff['last_name'] = df_staff['last_name']
+        df_dim_staff['department_name'] = df_department['department_name']
+        df_dim_staff['location'] = df_department['location']
+        df_dim_staff['email_address'] = df_staff['email_address']
+
+
+        df_dim_location = pd.DataFrame()
+        df_dim_location['location_id'] = df_fact_sales_order['agreed_delivery_location']
+        df_dim_location['address_line_1'] = df_address['address_line_1']
+        df_dim_location['address_line_2'] = df_address['address_line_2']
+        df_dim_location['district'] = df_address['district']
+        df_dim_location['city'] = df_address['city']
+        df_dim_location['postal_code'] = df_address['postal_code']
+        df_dim_location['country'] = df_address['country']
+        df_dim_location['phone'] = df_address['phone']
+
+
+        df_dim_design = pd.DataFrame()
+        df_dim_design['design_id'] = df_fact_sales_order['design_id']
+        df_dim_design['design_name'] = df_design['design_name']
+        df_dim_design['file_location'] = df_design['file_location']
+        df_dim_design['file_name'] = df_design['file_name']
+
+
+        df_dim_currency = pd.DataFrame()
+        df_dim_currency['currency_id'] = df_fact_sales_order['currency_id']
+        df_dim_currency['currency_code'] = df_currency['currency_code']
+        df_dim_currency['currency_name'] = df_dim_currency['currency_name'].where(df_dim_currency['currency_code'] == 'GBP', 'pound')
+        df_dim_currency['currency_name'] = df_dim_currency['currency_name'].where(df_dim_currency['currency_code'] == 'EUR', 'euro')
+        df_dim_currency['currency_name'] = df_dim_currency['currency_name'].where(df_dim_currency['currency_code'] == 'USD', 'dollar')
+
+
+# CASE WHEN in pandas:
+#     pd_df["difficulty"] = "Unknown"
+#     pd_df["difficulty"] = pd_df["difficulty"].case_when([
+#     (pd_df.eval("0 < Time < 30"), "Easy"), 
+#     (pd_df.eval("30 <= Time <= 60"), "Medium"), 
+#     (pd_df.eval("Time > 60"), "Hard")
+# ])
+
+
+#   INSERT INTO client_summary (client, quantity, total) SELECT client, SUM(quantity) AS quantity, SUM(total) AS totalFROM enriched_fact_table GROUP BY client;
+
+# result['serial_key'] = range(1, len(result) + 1)
+# df1 = df1[[column names in order you want]]
 
     
 
@@ -92,6 +128,40 @@ def lambda_handler_transform(event, context):
 #output as parquet
 #Load this to the transformation bucket
 
+
+
+# CREATE TABLE fact_sales_order
+#                     (
+#                     sales_record_id SERIAL PRIMARY KEY,
+#                     sales_order_id INT,
+#                     created_date DATE,
+#                     created_time TIME,
+#                     last_updated_date DATE,
+#                     last_updated_TIME,
+#                     sales_staff_id INT,
+#                     counterparty_id INT,
+#                     units_sold INT,
+#                     unit_price NUMERIC,
+#                     currency_id INT,
+#                     design_id INT,
+#                     agreed_payment_date DATE,
+#                     agreed_delivery_date DATE,
+#                     agreed_delivery_location_id INT
+#                     );
+#                     INSERT INTO fact_sales_order
+#                     (sales_order_id, created_date, created_time, last_updated_date, last_updated, sales_staff_id, counterparty_id,
+#                     units_sold, unit_price, currency_id, design_id, agreed_payment_date, agreed_delivery_date, agreed_delivery_location_id)
+                    #   SELECT
+                    #     sa.sales_order_id,
+                    #     DATE(sa.created_at) AS created_date,
+                    #     TIME(sa.created_at) AS created_time,
+                    #     DATE(sa.last_updated) AS last_updated_date,
+                    #     TIME(sa.last_updated) AS last_updated_time,
+                    #     sa.staff_id AS sales_staff_id,
+                    #     counterparty_id,
+                    #     units_sold
+                    # FROM
+                    #     df_sales_order AS sa
 
 
 
