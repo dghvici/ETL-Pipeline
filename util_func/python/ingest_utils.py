@@ -4,10 +4,10 @@ from datetime import datetime
 import logging
 
 
-if os.getenv("ENV") == "production":
-    from connection import connect_to_rds, close_rds
-else:
-    from util_func.python.connection import connect_to_rds, close_rds
+# if os.getenv("ENV") == "production":
+from connection import connect_to_rds, close_rds
+# else:
+#     from util_func.python.connection import connect_to_rds, close_rds
 
 
 ssm = boto3.client("ssm", "eu-west-2")
