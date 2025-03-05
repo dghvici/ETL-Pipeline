@@ -68,11 +68,11 @@ def check_database_updated():
     ]
 
     try:
-        timestamp_prev = retrieve_parameter(ssm, "timestamp_now")
+        timestamp_prev = retrieve_parameter(ssm, "timestamp_prev") #1981
         print(timestamp_prev, "prev")
-        timestamp_now = datetime.now()
+        timestamp_now = datetime.now() #2025
         print(timestamp_now, "now")
-        put_current_time(ssm, str(timestamp_now))
+        put_current_time(ssm, str(timestamp_now)) #2025
 
         conn = connect_to_rds()
         cur = conn.cursor()

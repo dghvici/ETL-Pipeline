@@ -40,12 +40,12 @@ logger.setLevel(logging.INFO)
 
 # trigered by the state machine every 30min
 def lambda_handler_ingest(event, context):
-    conn = connect_to_rds()
-    cur = conn.cursor()
-    previous_time = retrieve_parameter(ssm, "timestamp_prev")
-    current_time = retrieve_parameter(ssm, "timestamp_now")
     try:
-        updated_data_tables = check_database_updated()
+        conn = connect_to_rds()
+        cur = conn.cursor()
+        previous_time = retrieve_parameter(ssm, "timestamp_prev") # 1981
+        current_time = retrieve_parameter(ssm, "timestamp_now") # 2025
+        updated_data_tables = check_database_updated()  #prev 1981 curr 2025
         if updated_data_tables == []:
             logger.info("No new data.")
         else:
