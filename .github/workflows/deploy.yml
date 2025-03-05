@@ -63,6 +63,7 @@ jobs:
       - name: Terraform destroy
         working-directory: terraform
         run: terraform destroy -auto-approve
+        
       - name: Terraform Plan (Development)
         # if: matrix.environment == 'development'
         working-directory: terraform
