@@ -1,8 +1,8 @@
-import pytest, os 
-import datetime
-from unittest.mock import patch, Mock 
+import pytest
+from unittest.mock import patch 
 from util_func.python.timestamps import get_last_imported_timestamp, set_last_imported_timestamp
 
+######################################################################
 class TestUtilTimeStamps:
     def test_last_imported_timestamp_response_is_None(self):
         assert get_last_imported_timestamp() == None
@@ -24,7 +24,7 @@ class TestUtilTimeStamps:
         }
         assert get_last_imported_timestamp() == "2002-12-18"
 
-
+######################################################################
 class TestUtilTimestampError:
     @patch("util_func.python.timestamps.ssm.get_parameter")
     def test_get_last_imported_timestamp_error(self, mock_get_parameter):

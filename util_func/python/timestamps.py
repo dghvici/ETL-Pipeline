@@ -9,6 +9,7 @@ logger.setLevel(logging.INFO)
 
 ssm = boto3.client("ssm", "eu-west-2")
 
+######################################################################
 def get_last_imported_timestamp(): 
     try: 
         response = ssm.get_parameter(Name="LastImportedTimeStamp")
@@ -18,7 +19,8 @@ def get_last_imported_timestamp():
     except ClientError as e: 
         logger.error(f"Error retriving the previous timestamp: {e}")
         raise e 
-    
+
+######################################################################    
 def set_last_imported_timestamp(timestamp): 
     try: 
         ssm.put_parameter(

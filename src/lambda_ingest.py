@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import logging
 import pytz
 from datetime import datetime
-import pymysql 
+
 from botocore.exceptions import ClientError
 from util_func.python.connection import connect_to_rds, close_rds
 
@@ -132,6 +132,8 @@ def lambda_handler_ingest(event, context):
             bucket = "etl-lullymore-west-ingested"
             s3_client.put_object(Bucket=bucket, Key=key, Body=body)
 
+        # update timestampe 
+        set_last_imported_timestamp(current_time)
         # close rds 
         close_rds(conn)
 
