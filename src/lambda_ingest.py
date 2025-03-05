@@ -1,5 +1,5 @@
-# import os
-# import sys
+import os
+import sys
 import boto3
 import json
 from dotenv import load_dotenv
@@ -12,6 +12,7 @@ from botocore.exceptions import ClientError
 # os.environ['ENV'] = 'local'  # or 'production' for Lambda
 
 # if os.getenv("ENV") == "development":
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from connection import connect_to_rds, close_rds
 from ingest_utils import (
     check_database_updated,
@@ -39,22 +40,21 @@ logger.setLevel(logging.INFO)
 
 # trigered by the state machine every 30min
 def lambda_handler_ingest(event, context):
+    conn = connect_to_rds()
+    cur = conn.cursor()
+    previous_time = retrieve_parameter(ssm, "timestamp_prev")
+    current_time = retrieve_parameter(ssm, "timestamp_now")
     try:
         updated_data_tables = check_database_updated()
         if updated_data_tables == []:
             logger.info("No new data.")
         else:
             for table in updated_data_tables:
-                conn = connect_to_rds()
-                cur = conn.cursor()
-                previous_time = retrieve_parameter(ssm, "timestamp_prev")
-                current_time = retrieve_parameter(ssm, "timestamp_now")
                 query = f"""SELECT * FROM {table}
                         WHERE last_updated BETWEEN '{previous_time}'
                         and '{current_time}';"""
                 cur.execute(query)
                 response_date = cur.fetchall()
-                close_rds(conn)
                 response_dict = {f"{table}": response_date}
                 s3_client = boto3.client("s3")
                 body = json.dumps(response_dict)
@@ -69,3 +69,6 @@ def lambda_handler_ingest(event, context):
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise Exception("An unexpected error occurred") from e
+    finally:
+        close_rds(conn)
+
