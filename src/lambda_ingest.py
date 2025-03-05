@@ -12,6 +12,8 @@ from botocore.exceptions import ClientError
 # os.environ['ENV'] = 'local'  # or 'production' for Lambda
 
 # if os.getenv("ENV") == "development":
+
+
 from connection import connect_to_rds, close_rds
 from ingest_utils import (
     check_database_updated,
