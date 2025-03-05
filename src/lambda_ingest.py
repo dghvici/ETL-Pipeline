@@ -8,7 +8,7 @@ import pytz
 from datetime import datetime
 import pymysql 
 from botocore.exceptions import ClientError
-from util_func.connection import connect_to_rds, close_rds
+from util_func.python.connection import connect_to_rds, close_rds
 
 
 # Set this environment variable before running the script locally
@@ -34,11 +34,11 @@ from util_func.connection import connect_to_rds, close_rds
 # ssm=boto3.client("ssm", "eu-west-2")
 
 # load env variables
-load_dotenv()  # conditional only happens if runs in test environment
+# load_dotenv()  # conditional only happens if runs in test environment
 
-# configure logger
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+# # configure logger
+# logger = logging.getLogger()
+# logger.setLevel(logging.INFO)
 
 
 # trigered by the state machine every 30min
@@ -84,6 +84,12 @@ logger.setLevel(logging.INFO)
 secretsmanager = boto3.client("secretsmanager", "eu-west-2")
 ssm = boto3.client("ssm", "eu-west-2")
 s3_client = boto3.client("s3")
+load_dotenv()  # conditional only happens if runs in test environment
+
+# configure logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 
 def find_secret(secret_name):
     try:
@@ -93,27 +99,7 @@ def find_secret(secret_name):
         logger.error(f"Error retrieving secret {secret_name}: {e}")
         raise e
 
-def get_last_imported_timestamp(): 
-    try: 
-        response = ssm.get_parameter(Name="LastImportedTimeStamp")
-        return response["Parameter"]["Value"]
-    except ssm.exceptions.ParameterNotFound:
-        return None
-    except ClientError as e: 
-        logger.error(f"Error retriving the previous timestamp: {e}")
-        raise e 
-    
-def set_last_imported_timestamp(timestamp): 
-    try: 
-        ssm.put_parameter(
-            Name="LastImportedTimeStamp",
-            Value=timestamp,
-            Type="String",
-            Overwrite=True
-        )
-    except ClientError as e: 
-        logger.error(f"Error setting LastImportedTimeStamp: {e}")
-        raise e
+
 
 def lambda_handler_ingest(event, context):
     try:
@@ -139,7 +125,7 @@ def lambda_handler_ingest(event, context):
         logger.info(f"")
 
         # Upload data to S3
-        current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        current_time = datetime().strftime('%Y-%m-%dT%H:%M:%SZ')
         for table, data in [("fact_table", fact_data)]:
             body = json.dumps(data)
             key = f"{datetime.now().year}/{datetime.now().month}/ingested-{table}-{current_time}.json"
