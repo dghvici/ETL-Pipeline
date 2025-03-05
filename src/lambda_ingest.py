@@ -60,7 +60,7 @@ def lambda_handler_ingest(event, context):
                 body = json.dumps(response_dict)
                 key = f"{datetime.now().year}/{datetime.now().month}\
                 /ingested-{table}-{current_time}"
-                bucket = "lullymore-west-ingested"
+                bucket = "etl-lullymore-west-ingested-2025"
                 s3_client.put_object(Bucket=bucket, Key=key, Body=body)
             logger.info("All data has been ingested.")
     except ClientError as e:

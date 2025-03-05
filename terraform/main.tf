@@ -12,7 +12,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "lullymore-backend"
+    bucket = "lm-super-backend-bucket-2025"
     key = "nc-dataeng-etl-project/terraform.tfstate"
     region = "eu-west-2"
   }
