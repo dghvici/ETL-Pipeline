@@ -19,6 +19,8 @@ from ingest_utils import (
     check_database_updated,
     retrieve_parameter,
 )
+
+
 # else:
 #     sys.path.append(
 #         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,7 +31,7 @@ from ingest_utils import (
 #         retrieve_parameter,
 #     )
 
-ssm = boto3.client("ssm", "eu-west-2")
+ssm=boto3.client("ssm", "eu-west-2")
 
 # load env variables
 load_dotenv()  # conditional only happens if runs in test environment
