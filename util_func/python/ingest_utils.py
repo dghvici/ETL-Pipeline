@@ -2,12 +2,13 @@
 import boto3
 from datetime import datetime
 import logging
+import json
 
 
 # if os.getenv("ENV") == "development":
 from connection import connect_to_rds, close_rds
 # else:
-#     from util_func.python.connection import connect_to_rds, close_rds
+    # from util_func.python.connection import connect_to_rds, close_rds
 
 
 ssm = boto3.client("ssm", "eu-west-2")
@@ -43,6 +44,12 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
     except IndexError:
         logger.error("Error: Name does not exist in Parameter Store")
         raise
+
+
+def format_raw_data_into_json(table_name, column_names, rows):
+    formatted_output = {table_name: {"column_names": column_names, "rows": rows}}
+    json_output = json.dumps(formatted_output, default=str)
+    return json_output
 
 
 def check_database_updated():

@@ -17,16 +17,17 @@ from connection import connect_to_rds, close_rds
 from ingest_utils import (
     check_database_updated,
     retrieve_parameter,
+    format_raw_data_into_json
 )
 # else:
 #     sys.path.append(
 #         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #     )
-#     from util_func.python.connection import connect_to_rds, close_rds
-#     from util_func.python.ingest_utils import (
-#         check_database_updated,
-#         retrieve_parameter,
-#     )
+    # from util_func.python.connection import connect_to_rds, close_rds
+    # from util_func.python.ingest_utils import (
+    #     check_database_updated,
+    #     retrieve_parameter,
+    # )
 
 ssm=boto3.client("ssm", "eu-west-2")
 
@@ -54,15 +55,14 @@ def lambda_handler_ingest(event, context):
                         WHERE last_updated BETWEEN '{previous_time}'
                         and '{current_time}';"""
                 cur.execute(query)
-                response_date = cur.fetchall()
+                row_data = cur.fetchall()
                 column_names = [desc[0] for desc in cur.description] 
-                response_dict = {"columns": column_names, table: response_date}
+                json_body = format_raw_data_into_json(table, column_names, row_data)
                 s3_client = boto3.client("s3")
-                body = json.dumps(response_dict, default=str)
                 key = f"{datetime.now().year}/{datetime.now().month}\
                 /ingested-{table}-{current_time}"
                 bucket = "etl-lullymore-west-ingested"
-                s3_client.put_object(Bucket=bucket, Key=key, Body=body)
+                s3_client.put_object(Bucket=bucket, Key=key, Body=json_body)
             logger.info("All data has been ingested.")
     except ClientError as e:
         logger.error(f"ClientError: {str(e)}")
