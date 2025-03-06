@@ -52,6 +52,7 @@ def lambda_handler_ingest(event, context):
 
         # update timestamp 
         set_last_imported_timestamp(current_time)
+        logger.info(f"last imported timestamp updated to {current_time}")
 
         # close rds 
         close_rds(conn)

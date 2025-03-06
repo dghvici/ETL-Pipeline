@@ -16,15 +16,7 @@ load_dotenv()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-######################################################################
-def get_secret(secret_name):
-    try:
-        response = secretsmanager.get_secret_value(SecretId=secret_name)
-        return json.loads(response["SecretString"])
-    except ClientError as e:
-        logger.error(f"Error retrieving secret {secret_name}: {e}")
-        raise e
-    
+
 ######################################################################
 def connect_to_rds(raise_exception=False):
     try:
@@ -56,3 +48,13 @@ def close_rds(conn):
         logger.info("Connection to RDS closed")
     else:
         logger.error("Connection to RDS is already closed")
+
+######################################################################
+def get_secret(secret_name):
+    try:
+        response = secretsmanager.get_secret_value(SecretId=secret_name)
+        return json.loads(response["SecretString"])
+    except ClientError as e:
+        logger.error(f"Error retrieving secret {secret_name}: {e}")
+        raise e
+    
