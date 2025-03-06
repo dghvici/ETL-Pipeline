@@ -80,3 +80,4 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attachment" {
   role       = aws_iam_role.cloudwatch_role.name
   policy_arn = aws_iam_policy.cloudwatch_policy.arn
 }
+
