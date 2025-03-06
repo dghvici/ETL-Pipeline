@@ -1,3 +1,4 @@
+# Create the IAM policy document
 data "aws_iam_policy_document" "cloudwatch_policy" {
   statement {
     effect = "Allow"
@@ -48,12 +49,34 @@ data "aws_iam_policy_document" "cloudwatch_policy" {
   }
 }
 
-resource "aws_iam_role" "cloudwatch_role" {
-    name    = "cloudwatch-role"
-    assume_role_policy = data.aws_iam_policy_document.cloudwatch_policy.json
+# Create the IAM policy from the policy document
+resource "aws_iam_policy" "cloudwatch_policy" {
+  name        = "CloudWatchPolicy"
+  description = "Policy for CloudWatch logging, metrics, and alarms"
+  policy      = data.aws_iam_policy_document.cloudwatch_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
-  role          = aws_iam_role.cloudwatch_role.name
-  policy_arn    =  data.aws_iam_policy_document.cloudwatch_policy.arn
+# Create the IAM role for Lambda
+resource "aws_iam_role" "cloudwatch_role" {
+  name               = "cloudwatch-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# Attach the IAM policy to the role
+resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attachment" {
+  role       = aws_iam_role.cloudwatch_role.name
+  policy_arn = aws_iam_policy.cloudwatch_policy.arn
 }
