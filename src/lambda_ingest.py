@@ -44,9 +44,11 @@ def lambda_handler_ingest(event, context):
     try:
         conn = connect_to_rds()
         cur = conn.cursor()
-        updated_data_tables = check_database_updated()  #prev 1981 curr 2025
-        previous_time = retrieve_parameter(ssm, "timestamp_prev") # 1981
-        current_time = retrieve_parameter(ssm, "timestamp_now") # 2025
+        updated_data_tables = check_database_updated()
+        previous_time = retrieve_parameter(ssm, "timestamp_prev")
+        print(previous_time, "prev in lambda_handler")
+        current_time = retrieve_parameter(ssm, "timestamp_now")
+        print(current_time, "current in lambda_handler")
         if updated_data_tables == []:
             logger.info("No new data.")
         else:

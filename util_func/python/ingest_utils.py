@@ -42,7 +42,8 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
             response = ssm.get_parameters(Names=[parameter_name])
         return response["Parameters"][0]["Value"]
     except IndexError:
-        logger.error("Error: Name does not exist in Parameter Store")
+        logger.error("Parameter does not exist in Parameter Store\
+                     - ignore error if first invokation")
         raise
 
 
@@ -75,7 +76,7 @@ def check_database_updated():
     ]
 
     try:
-        timestamp_prev = retrieve_parameter(ssm, "timestamp_prev") #1981
+        timestamp_prev = retrieve_parameter(ssm, "timestamp_now") #1981
         print(timestamp_prev, "prev")
         timestamp_now = datetime.now() #2025
         print(timestamp_now, "now")

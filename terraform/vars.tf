@@ -17,7 +17,7 @@ variable "load_lambda" {
 
 variable "default_timeout" {
   type    = number
-  default = 10
+  default = 40
 }
 
 variable "state_machine_name" {
