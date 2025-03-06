@@ -1,7 +1,7 @@
 # import os
 # import sys
 import boto3
-import json
+# import json
 from dotenv import load_dotenv
 import logging
 from datetime import datetime

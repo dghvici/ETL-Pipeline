@@ -196,7 +196,8 @@
 #     @patch("src.lambda_ingest.connect_to_rds")
 #     @patch("src.lambda_ingest.retrieve_parameter")
 #     @patch("src.lambda_ingest.boto3.client")
-#     @patch("src.lambda_ingest.lambda_handler_ingest.column_names", return_value=["col1", "col2"])
+#     @patch("src.lambda_ingest.lambda_handler_ingest.column_names", 
+# return_value=["col1", "col2"])
 #     def test_data_uploaded_to_s3_bucket(
 #         self,
 #         mock_boto_client,
