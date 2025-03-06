@@ -1,9 +1,10 @@
 import pandas as pd
-# import pyarrow as pa
-# import pyarrow.parquet as pq
+import pyarrow as pa
+import pyarrow.parquet as pq
 import json
 import boto3
 import re
+from datetime import datetime as dt
 
 
 def lambda_handler_transform(event, context):
@@ -13,6 +14,7 @@ def lambda_handler_transform(event, context):
     #Trigger an S3 event (JSON file uploaded)- this will be the event
     # Get the object from the event and show its content type\
     list_of_keys = []
+    list_of_filepath = []
     bucket = event['Records'][0]['s3']['bucket']['name']
     for record in event['Records']:
           list_of_keys.append(record['s3']['object']['key'])
@@ -38,6 +40,7 @@ def lambda_handler_transform(event, context):
             elif table_name == 'address':
                 df_address = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
 
+
         df_sales_order['created_at'] = pd.to_datetime(df_sales_order['created_at'])
         df_sales_order['last_updated'] = pd.to_datetime(df_sales_order['last_updated'])
         df_sales_order['agreed_payment_date'] = pd.to_datetime(df_sales_order['agreed_payment_date'])
@@ -58,19 +61,22 @@ def lambda_handler_transform(event, context):
         df_fact_sales_order['agreed_payment_date'] = df_sales_order['agreed_payment_date']
         df_fact_sales_order['agreed_delivery_date'] = df_sales_order['agreed_delivery_date']
         df_fact_sales_order['agreed_delivery_location_id'] = df_sales_order['agreed_delivery_location_id']
-
+        df_fact_sales_order.to_parquet(path=f'{dt.now().year}/{dt.now().month}/transformed-df_fact_sales_order-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.parquet', engine='pyarrow', compression='gzip')
 
         df_dim_staff = pd.DataFrame()
-        df_dim_staff['staff_id'] = df_fact_sales_order['sales_staff_id']
+        df_dim_staff['staff_id'] = df_sales_order['staff_id']
         df_dim_staff['first_name'] = df_staff['first_name']
         df_dim_staff['last_name'] = df_staff['last_name']
         df_dim_staff['department_name'] = df_department['department_name']
         df_dim_staff['location'] = df_department['location']
         df_dim_staff['email_address'] = df_staff['email_address']
+        file_path = df_dim_staff.to_parquet(path=f'{dt.now().year}/{dt.now().month}/transformed-df_dim_staff-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.parquet', engine='pyarrow', compression='gzip')
+        list_of_filepath.append(file_path)
+
 
 
         df_dim_location = pd.DataFrame()
-        df_dim_location['location_id'] = df_fact_sales_order['agreed_delivery_location']
+        df_dim_location['location_id'] = df_sales_order['agreed_delivery_location']
         df_dim_location['address_line_1'] = df_address['address_line_1']
         df_dim_location['address_line_2'] = df_address['address_line_2']
         df_dim_location['district'] = df_address['district']
@@ -78,21 +84,50 @@ def lambda_handler_transform(event, context):
         df_dim_location['postal_code'] = df_address['postal_code']
         df_dim_location['country'] = df_address['country']
         df_dim_location['phone'] = df_address['phone']
-
+        file_path = df_dim_location.to_parquet(path=f'{dt.now().year}/{dt.now().month}/transformed-df_dim_location-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.parquet', engine='pyarrow', compression='gzip')
+        list_of_filepath.append(file_path)
 
         df_dim_design = pd.DataFrame()
-        df_dim_design['design_id'] = df_fact_sales_order['design_id']
+        df_dim_design['design_id'] = df_design['design_id']
         df_dim_design['design_name'] = df_design['design_name']
         df_dim_design['file_location'] = df_design['file_location']
         df_dim_design['file_name'] = df_design['file_name']
-
+        file_path = df_dim_location.to_parquet(path=f'{dt.now().year}/{dt.now().month}/transformed-df_dim_location-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.parquet', engine='pyarrow', compression='gzip')
+        list_of_filepath.append(file_path)
 
         df_dim_currency = pd.DataFrame()
-        df_dim_currency['currency_id'] = df_fact_sales_order['currency_id']
+        df_dim_currency['currency_id'] = df_currency['currency_id']
         df_dim_currency['currency_code'] = df_currency['currency_code']
         df_dim_currency['currency_name'] = df_dim_currency['currency_name'].where(df_dim_currency['currency_code'] == 'GBP', 'pound')
         df_dim_currency['currency_name'] = df_dim_currency['currency_name'].where(df_dim_currency['currency_code'] == 'EUR', 'euro')
         df_dim_currency['currency_name'] = df_dim_currency['currency_name'].where(df_dim_currency['currency_code'] == 'USD', 'dollar')
+        file_path = df_dim_currency.to_parquet(path=f'{dt.now().year}/{dt.now().month}/transformed-df_dim_currency-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.parquet', engine='pyarrow', compression='gzip')
+        list_of_filepath.append(file_path)
+
+        df_dim_counterparty = pd.DataFrame()
+        df_dim_counterparty['counterparty_id'] = df_counterparty['counterparty_id']
+        df_dim_counterparty['counterparty_legal_name'] = df_counterparty['counterparty_legal_name']
+        df_dim_counterparty['counterparty_legal_address_line_1'] = df_address['address_line_1']
+        df_dim_counterparty['counterparty_legal_address_line_2'] = df_address['address_line_2']
+        df_dim_counterparty['counterparty_legal_district'] = df_address['district']
+        df_dim_counterparty['counterparty_legal_city'] = df_address['city']
+        df_dim_counterparty['counterparty_legal_postal_code'] = df_address['postal_code']
+        df_dim_counterparty['counterparty_legal_country'] = df_address['country']
+        df_dim_counterparty['counterparty_legal_phone_number'] = df_address['number']
+        file_path = df_dim_counterparty.to_parquet(path=f'{dt.now().year}/{dt.now().month}/transformed-df_dim_counterparty-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}.parquet', engine='pyarrow', compression='gzip')
+        list_of_filepath.append(file_path)
+
+
+
+        for file in list_of_filepath:
+            response = s3.put_object(
+            Body= file,
+            Bucket= "etl-lullymore-west-transformed",
+            Key=f"{dt.now().year}/{dt.now().month}/transformed-{file}-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            )
+
+
+
 
 
 # CASE WHEN in pandas:
