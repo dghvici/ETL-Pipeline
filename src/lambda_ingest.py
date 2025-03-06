@@ -55,9 +55,10 @@ def lambda_handler_ingest(event, context):
                         and '{current_time}';"""
                 cur.execute(query)
                 response_date = cur.fetchall()
-                response_dict = {f"{table}": response_date}
+                column_names = [desc[0] for desc in cur.description] 
+                response_dict = {table: response_date}
                 s3_client = boto3.client("s3")
-                body = json.dumps(response_dict)
+                body = json.dumps(response_dict, default=str)
                 key = f"{datetime.now().year}/{datetime.now().month}\
                 /ingested-{table}-{current_time}"
                 bucket = "etl-lullymore-west-ingested"
