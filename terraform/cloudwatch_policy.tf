@@ -1,7 +1,7 @@
 # permissions for logging, metrics and alarms 
 
 resource "aws_iam_policy" "cloudwatch_policy" {
-    name = "CloudWatchPolicy"
+    name = "Cloud-Watch-Policy"
     description = "Policy for CloudWatch logging, metrics and alarms"
     policy = jsonencode({
         Version = "2012-10-17"
@@ -48,10 +48,29 @@ resource "aws_iam_policy" "cloudwatch_policy" {
         ]
     }) 
 }
-resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
-  role          = aws_iam_policy.cloudwatch_policy.name
-  policy_arn    =  aws_iam_policy.cloudwatch_policy.arn
+
+
+
+# IAM Role
+resource "aws_iam_role" "cloudwatch_role" {
+    name               = "Cloud-Watch-Role"
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17",
+        Statement = [
+            {
+                Effect = "Allow",
+                Principal = {
+                    Service = "lambda.amazonaws.com"
+                },
+                Action = "sts:AssumeRole"
+            }
+        ]
+    })
 }
 
-
+# Attach Policy to Role
+resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attachment" {
+    role       = aws_iam_role.cloudwatch_role.name
+    policy_arn = aws_iam_policy.cloudwatch_policy.arn
+}
 

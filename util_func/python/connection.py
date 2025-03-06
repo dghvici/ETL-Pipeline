@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import logging
 
 # load env variables
-load_dotenv()  # conditional only happens if runs in test environment
+load_dotenv()
 
 # configure logger
 logger = logging.getLogger()
@@ -21,7 +21,7 @@ def connect_to_rds(raise_exception=False):
             port=os.getenv("PORT"),
         )
         logger.info("Successfully connected to RDS")
-        logger.info(f"{os.getenv("RDS_NAME")}")
+        # logger.info(os.getenv("RDS_NAME"))
         return connection
     except psycopg2.OperationalError as op_error:
         logger.error(f"OperationalError connecting to RDS: {op_error}")
@@ -35,7 +35,6 @@ def connect_to_rds(raise_exception=False):
         return None
 
 
-# TO BE DELETED
 ###############################################################################
 
 
