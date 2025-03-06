@@ -20,4 +20,3 @@ class TestGetTableName:
         result = get_table_name(file_key)
         assert result == expected
 
-    
