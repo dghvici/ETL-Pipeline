@@ -17,7 +17,8 @@ from connection import connect_to_rds, close_rds
 from ingest_utils import (
     check_database_updated,
     retrieve_parameter,
-    format_raw_data_into_json
+    format_raw_data_into_json,
+    put_prev_time
 )
 # else:
 #     sys.path.append(
@@ -66,6 +67,7 @@ def lambda_handler_ingest(event, context):
                 bucket = "etl-lullymore-west-ingested"
                 s3_client.put_object(Bucket=bucket, Key=key, Body=json_body)
             logger.info("All data has been ingested.")
+        put_prev_time(ssm, str(current_time))
     except ClientError as e:
         logger.error(f"ClientError: {str(e)}")
         raise Exception("Error interacting with AWS services") from e

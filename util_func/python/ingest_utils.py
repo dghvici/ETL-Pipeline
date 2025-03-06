@@ -77,9 +77,9 @@ def check_database_updated():
 
     try:
         timestamp_prev = retrieve_parameter(ssm, "timestamp_now") #1981
-        print(timestamp_prev, "prev")
+        print(timestamp_prev, "prev in check database util")
         timestamp_now = datetime.now() #2025
-        print(timestamp_now, "now")
+        print(timestamp_now, "now in check database util")
         put_current_time(ssm, str(timestamp_now)) #2025
 
         conn = connect_to_rds()
@@ -97,8 +97,6 @@ def check_database_updated():
             )  # fetches the rows, returning them as a list of tuples
             if new_dates:
                 updated_tables.append(table)
-
-        put_prev_time(ssm, str(timestamp_now))
 
         return updated_tables
 
