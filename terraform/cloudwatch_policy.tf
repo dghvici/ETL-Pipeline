@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "cloudwatch_policy" {
 
 resource "aws_iam_role" "cloudwatch_role" {
     name    = "cloudwatch-role"
-    assume_role_policy = data.aws_iam_policy.cloudwatch_policy.json
+    assume_role_policy = data.aws_iam_policy_document.cloudwatch_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
