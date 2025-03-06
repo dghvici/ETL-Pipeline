@@ -3,19 +3,20 @@ import pandas as pd
 import pyarrow.parquet as pq
 from io import BytesIO
 from sqlalchemy import create_engine
-import re
+# import re
 import logging
 from botocore.exceptions import ClientError
 import os
+from utils.transform_load_utils import get_table_name
 
 s3_client = boto3.client("s3")
 
 #rds database credentials - needs updating based on github secrets/aws secrets
-user=os.getenv("RDS_USER")
-password=os.getenv("RDS_PASSWORD")
-database=os.getenv("RDS_NAME")
-host=os.getenv("RDS_HOST")
-port=os.getenv("PORT")
+user=os.getenv("OLAP_USER")
+password=os.getenv("OLAP_PASSWORD")
+database=os.getenv("OLAP_NAME")
+host=os.getenv("OLAP_HOST")
+port=os.getenv("OLAP_PORT")
 
 # configure logger
 logger = logging.getLogger()
@@ -39,9 +40,7 @@ def lambda_handler_load(event, context):
         for object_key in object_keys:
             #retrieve the name of the table to be uploaded to from the key
             #assume key in format "2025/1/transformed-fact_sales_order-2025-01-02 24:09:04:3424"
-            re_pattern = r"transformed-(\w+)"
-            match = re.search(re_pattern, object_key)
-            table_name = match.group(1)
+            table_name = get_table_name(object_key)
             #load object from s3 bucket
             file_object = s3_client.get_object(Bucket=bucket, Key=object_key)
             #read as a parquet file

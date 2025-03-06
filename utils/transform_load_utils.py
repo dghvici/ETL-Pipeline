@@ -1,4 +1,13 @@
 import re
+import boto3
+import pyarrow.parquet as pq
+from io import BytesIO
+import logging
+
+s3_client = boto3.client("s3")
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def get_table_name(file_key):
     """function to extract the table name from the
@@ -13,5 +22,8 @@ def get_table_name(file_key):
         table_name = match.group(1)
         return table_name
     except UnboundLocalError as e:
-        #needs something else adding
-        return None
+        logger.error("File name does not conform to the expected \
+        format (does not include 'ingested' or 'transformed')")
+        raise
+
+
