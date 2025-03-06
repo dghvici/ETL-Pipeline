@@ -5,9 +5,12 @@ import json
 import boto3
 import re
 from datetime import datetime as dt
+import io
 
 
 def lambda_handler_transform(event, context):
+
+    transform_bucket = "etl-lullymore-west-transformed"
 
     s3 = boto3.client('s3')
 
@@ -15,7 +18,9 @@ def lambda_handler_transform(event, context):
     # Get the object from the event and show its content type\
     list_of_keys = []
     list_of_filepath = []
+
     bucket = event['Records'][0]['s3']['bucket']['name']
+
     for record in event['Records']:
           list_of_keys.append(record['s3']['object']['key'])
 # Load json data from bucket
@@ -26,20 +31,21 @@ def lambda_handler_transform(event, context):
             file_content = response['Body'].read().decode('utf-8')
             data = json.loads(file_content)
             if table_name == 'counterparty':
-                df_counterparty = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
+                df_counterparty = pd.DataFrame((data[table_name]["rows"]), columns=data[table_name]["column_names"])
             elif table_name == 'currency':
-                df_currency = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
+                df_currency = pd.DataFrame((data[table_name]["rows"]), columns=data[table_name]["column_names"])
             elif table_name == 'department':
-                df_department = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
+                df_department = pd.DataFrame((data[table_name]["rows"]), columns=data[table_name]["column_names"])
             elif table_name == 'design':
-                df_design = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
+                df_design = pd.DataFrame((data[table_name]["rows"]), columns=data[table_name]["column_names"])
             elif table_name == 'staff':
-                df_staff = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
+                df_staff = pd.DataFrame((data[table_name]["rows"]), columns=data[table_name]["column_names"])
             elif table_name == 'sales_order':
-                df_sales_order = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
+                df_sales_order = pd.DataFrame((data[table_name]["rows"]), columns=data[table_name]["column_names"])
             elif table_name == 'address':
-                df_address = pd.Dataframe((data[table_name]["rows"]), columns=data[table_name]["column_names"])
+                df_address = pd.DataFrame((data[table_name]["rows"]), columns=data[table_name]["column_names"])
 
+        buffer = io.BytesIO()
 
         df_sales_order['created_at'] = pd.to_datetime(df_sales_order['created_at'])
         df_sales_order['last_updated'] = pd.to_datetime(df_sales_order['last_updated'])
@@ -122,8 +128,8 @@ def lambda_handler_transform(event, context):
         for file in list_of_filepath:
             response = s3.put_object(
             Body= file,
-            Bucket= "etl-lullymore-west-transformed",
-            Key=f"{dt.now().year}/{dt.now().month}/transformed-{file}-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            Bucket= transform_bucket,
+            Key=f"{dt.now().year}/{dt.now().month}/transformed-{...}-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
             )
 
 
