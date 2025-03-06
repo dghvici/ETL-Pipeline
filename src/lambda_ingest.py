@@ -1,6 +1,7 @@
 # import os
 # import sys
 import boto3
+
 # import json
 from dotenv import load_dotenv
 import logging
@@ -18,19 +19,20 @@ from ingest_utils import (
     check_database_updated,
     retrieve_parameter,
     format_raw_data_into_json,
-    put_prev_time
+    put_prev_time,
 )
+
 # else:
 #     sys.path.append(
 #         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #     )
-    # from util_func.python.connection import connect_to_rds, close_rds
-    # from util_func.python.ingest_utils import (
-    #     check_database_updated,
-    #     retrieve_parameter,
-    # )
+# from util_func.python.connection import connect_to_rds, close_rds
+# from util_func.python.ingest_utils import (
+#     check_database_updated,
+#     retrieve_parameter,
+# )
 
-ssm=boto3.client("ssm", "eu-west-2")
+ssm = boto3.client("ssm", "eu-west-2")
 
 # load env variables
 load_dotenv()  # conditional only happens if runs in test environment
@@ -59,8 +61,10 @@ def lambda_handler_ingest(event, context):
                         and '{current_time}';"""
                 cur.execute(query)
                 row_data = cur.fetchall()
-                column_names = [desc[0] for desc in cur.description] 
-                json_body = format_raw_data_into_json(table, column_names, row_data)
+                column_names = [desc[0] for desc in cur.description]
+                json_body = format_raw_data_into_json(
+                    table, column_names, row_data
+                )
                 s3_client = boto3.client("s3")
                 key = f"{datetime.now().year}/{datetime.now().month}\
                 /ingested-{table}-{current_time}"
