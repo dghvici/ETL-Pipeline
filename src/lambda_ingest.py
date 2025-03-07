@@ -80,3 +80,5 @@ def lambda_handler_ingest(event, context):
         raise Exception("An unexpected error occurred") from e
     finally:
         close_rds(conn)
+
+        
