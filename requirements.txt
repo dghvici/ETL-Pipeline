@@ -10,7 +10,7 @@ docformatter==1.7.5
 pytest-cov==6.0.0
 dotenv==0.9.9
 psycopg2-binary==2.9.10
-psycopg2==2.9.10
+# psycopg2==2.9.10
 botocore==1.37.2
 pandas==2.2.3
 pyarrow==19.0.1
