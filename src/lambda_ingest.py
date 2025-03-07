@@ -2,7 +2,7 @@
 # import sys
 import boto3
 
-# import json
+import json
 from dotenv import load_dotenv
 import logging
 from datetime import datetime
@@ -18,7 +18,6 @@ from connection import connect_to_rds, close_rds
 from ingest_utils import (
     check_database_updated,
     retrieve_parameter,
-    format_raw_data_into_json,
     put_prev_time,
 )
 
@@ -55,6 +54,7 @@ def lambda_handler_ingest(event, context):
         if updated_data_tables == []:
             logger.info("No new data.")
         else:
+            formatted_output_list = []
             for table in updated_data_tables:
                 query = f"""SELECT * FROM {table}
                         WHERE last_updated BETWEEN '{previous_time}'
@@ -62,14 +62,18 @@ def lambda_handler_ingest(event, context):
                 cur.execute(query)
                 row_data = cur.fetchall()
                 column_names = [desc[0] for desc in cur.description]
-                json_body = format_raw_data_into_json(
-                    table, column_names, row_data
-                )
-                s3_client = boto3.client("s3")
-                key = f"{datetime.now().year}/{datetime.now().month}\
-                /ingested-{table}-{current_time}"
-                bucket = "etl-lullymore-west-ingested"
-                s3_client.put_object(Bucket=bucket, Key=key, Body=json_body)
+                formatted_output = {
+                    table: {"column_names": column_names, "rows": row_data}
+                }
+                formatted_output_list.append(formatted_output)
+            formatted_output = {"New_data": formatted_output_list}
+            json_body = json.dumps(formatted_output, default=str)
+            s3_client = boto3.client("s3")
+            year = datetime.now().year
+            month = datetime.now().month
+            key = f"{year}/{month}/totesys-data-ingested-{current_time}"
+            bucket = "etl-lullymore-west-ingested"
+            s3_client.put_object(Bucket=bucket, Key=key, Body=json_body)
             logger.info("All data has been ingested.")
         put_prev_time(ssm, str(current_time))
     except ClientError as e:
