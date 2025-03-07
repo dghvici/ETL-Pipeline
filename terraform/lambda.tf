@@ -47,8 +47,9 @@ resource "aws_lambda_function" "transform_function" {
   function_name = var.transform_lambda
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "lambda_transform.lambda_handler_transform"
-  runtime       = "python3.12"
-  layers        = [aws_lambda_layer_version.modules_layer_transform.arn]
+  runtime       = "python3.10"
+  layers        = [aws_lambda_layer_version.modules_layer_transform.arn, 
+  "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:23"]
   timeout       = var.default_timeout
   source_code_hash = data.archive_file.transform_lambda.output_base64sha512
   environment {
