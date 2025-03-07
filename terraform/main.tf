@@ -11,11 +11,11 @@ terraform {
       version = "2.7.0"
     }
   }
-  backend "s3" {
-    bucket = "tf-state-lullymore-west-project"
-    key = "nc-dataeng-etl-project/terraform.tfstate"
-    region = "eu-west-2"
-  }
+  # backend "s3" {
+  #   bucket = "tf-state-lullymore-west-project"
+  #   key = "nc-dataeng-etl-project/terraform.tfstate"
+  #   region = "eu-west-2"
+  # }
 }
 
 

@@ -1,0 +1,181 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "Ingest",
+    "States": {
+      "Ingest": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "Output": "{% $states.result.Payload %}",
+        "Arguments": {
+          "FunctionName": "arn:aws:lambda:eu-west-2:920373031093:function:Ingest-Lambda:$LATEST"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds": 1,
+            "MaxAttempts": 3,
+            "BackoffRate": 2,
+            "JitterStrategy": "FULL"
+          }
+        ],
+        "Next": "Parallel"
+      },
+      "Parallel": {
+        "Type": "Parallel",
+        "Branches": [
+          {
+            "StartAt": "Ingested Data",
+            "States": {
+              "Ingested Data": {
+                "Type": "Task",
+                "Arguments": {
+                  "Body": {},
+                  "Bucket": "MyData",
+                  "Key": "MyData"
+                },
+                "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+                "Next": "Transform"
+              },
+              "Transform": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::lambda:invoke",
+                "Output": "{% $states.result.Payload %}",
+                "Arguments": {
+                  "FunctionName": "arn:aws:lambda:eu-west-2:920373031093:function:Transform-Lambda:$LATEST",
+                  "Payload": "{% $states.input %}"
+                },
+                "Retry": [
+                  {
+                    "ErrorEquals": [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2,
+                    "JitterStrategy": "FULL"
+                  }
+                ],
+                "Next": "Parallel (1)"
+              },
+              "Parallel (1)": {
+                "Type": "Parallel",
+                "End": true,
+                "Branches": [
+                  {
+                    "StartAt": "Processed Data",
+                    "States": {
+                      "Processed Data": {
+                        "Type": "Task",
+                        "Arguments": {
+                          "Body": {},
+                          "Bucket": "MyData",
+                          "Key": "MyData"
+                        },
+                        "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+                        "Next": "Load"
+                      },
+                      "Load": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "Output": "{% $states.result.Payload %}",
+                        "Arguments": {
+                          "FunctionName": "arn:aws:lambda:eu-west-2:920373031093:function:Load-Lambda:$LATEST",
+                          "Payload": "{% $states.input %}"
+                        },
+                        "Retry": [
+                          {
+                            "ErrorEquals": [
+                              "Lambda.ServiceException",
+                              "Lambda.AWSLambdaException",
+                              "Lambda.SdkClientException",
+                              "Lambda.TooManyRequestsException"
+                            ],
+                            "IntervalSeconds": 1,
+                            "MaxAttempts": 3,
+                            "BackoffRate": 2,
+                            "JitterStrategy": "FULL"
+                          }
+                        ],
+                        "Next": "Parallel (2)"
+                      },
+                      "Parallel (2)": {
+                        "Type": "Parallel",
+                        "Branches": [
+                          {
+                            "StartAt": "PutRecord",
+                            "States": {
+                              "PutRecord": {
+                                "Type": "Task",
+                                "Arguments": {
+                                  "DeliveryStreamName": "MyData",
+                                  "Record": {
+                                    "Data": "BLOB"
+                                  }
+                                },
+                                "Resource": "arn:aws:states:::aws-sdk:firehose:putRecord",
+                                "End": true
+                              }
+                            }
+                          },
+                          {
+                            "StartAt": "UpdateMonitor (2)",
+                            "States": {
+                              "UpdateMonitor (2)": {
+                                "Type": "Task",
+                                "Arguments": {
+                                  "MonitorName": "MyData"
+                                },
+                                "Resource": "arn:aws:states:::aws-sdk:internetmonitor:updateMonitor",
+                                "End": true
+                              }
+                            }
+                          }
+                        ],
+                        "End": true
+                      }
+                    }
+                  },
+                  {
+                    "StartAt": "UpdateMonitor (1)",
+                    "States": {
+                      "UpdateMonitor (1)": {
+                        "Type": "Task",
+                        "Arguments": {
+                          "MonitorName": "MyData"
+                        },
+                        "Resource": "arn:aws:states:::aws-sdk:internetmonitor:updateMonitor",
+                        "End": true
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "StartAt": "UpdateMonitor",
+            "States": {
+              "UpdateMonitor": {
+                "Type": "Task",
+                "Arguments": {
+                  "MonitorName": "MyData"
+                },
+                "Resource": "arn:aws:states:::aws-sdk:internetmonitor:updateMonitor",
+                "End": true
+              }
+            }
+          }
+        ],
+        "End": true
+      }
+    },
+    "QueryLanguage": "JSONata"
+  }
