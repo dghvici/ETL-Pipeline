@@ -1,6 +1,7 @@
 import boto3
 import json
 
+
 def lambda_handler_transform(event, context):
     s3_client = boto3.client("s3")
     key = "test"
