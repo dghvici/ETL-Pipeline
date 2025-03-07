@@ -77,6 +77,7 @@ check-coverage:
 # Run security tests
 run-security: security-test audit-test
 
+
 # Run formatting and tests
 run-checks: run-black run-docformatter run-flake8 unit-test check-coverage
 
