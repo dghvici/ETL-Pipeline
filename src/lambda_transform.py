@@ -127,8 +127,8 @@ def lambda_handler_transform(event, context):
 
         for file in list_of_filepath:
             response = s3.put_object(
-            Body= file,
-            Bucket= transform_bucket,
+            Body = file,
+            Bucket = transform_bucket,
             Key=f"{dt.now().year}/{dt.now().month}/transformed-{...}-{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
             )
 
