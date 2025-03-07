@@ -64,7 +64,7 @@ resource "aws_lambda_function" "load_function" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "lambda_load.lambda_handler_load"
   runtime       = "python3.12"
-  layers        = [aws_lambda_layer_version.modules_layer.arn, aws_lambda_layer_version.utils_layer.arn]
+  layers        = [aws_lambda_layer_version.modules_layer_transform.arn]
   source_code_hash = data.archive_file.load_lambda.output_base64sha512
 }
 
@@ -102,4 +102,16 @@ resource "aws_lambda_layer_version" "utils_layer" {
 }
 
 
+data "archive_file" "modules_layer_transform" {
+  type        = "zip"
+  output_file_mode = "0666"
+  output_path = "${path.module}/../packages/layers/modules_transform.zip"
+  source_dir = "${path.module}/../modules_transform/"
+}
 
+resource "aws_lambda_layer_version" "modules_layer_transform" {
+  filename   = "${path.module}/../packages/layers/modules_transform.zip"
+  layer_name = "lambda_transform_modules_layer"
+
+  compatible_runtimes = ["python3.11"]
+}

@@ -3,7 +3,7 @@
 import boto3
 
 import json
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
@@ -34,7 +34,7 @@ from ingest_utils import (
 ssm = boto3.client("ssm", "eu-west-2")
 
 # load env variables
-load_dotenv()  # conditional only happens if runs in test environment
+# load_dotenv()  # conditional only happens if runs in test environment
 
 # configure logger
 logger = logging.getLogger()
