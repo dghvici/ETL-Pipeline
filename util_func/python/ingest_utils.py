@@ -75,9 +75,7 @@ def check_database_updated():
 
     try:
         timestamp_prev = retrieve_parameter(ssm, "timestamp_now")
-        print(timestamp_prev, "prev")
         timestamp_now = datetime.now()
-        print(timestamp_now, "now")
         put_current_time(ssm, str(timestamp_now))
 
         conn = connect_to_rds()
