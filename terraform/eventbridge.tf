@@ -62,12 +62,12 @@ resource "aws_cloudwatch_event_rule" "s3_object_created_transform" {
 EOF
 }
 
-# #Lambda Target > Transform
-# resource "aws_cloudwatch_event_target" "lambda_target_transform" {
-#   rule      = aws_cloudwatch_event_rule.s3_object_created_transform.name
-#   target_id = "SendToLambda"
-#   arn       = aws_lambda_function.transform_function.arn
-# }
+#Lambda Target > Transform
+resource "aws_cloudwatch_event_target" "lambda_target_transform" {
+  rule      = aws_cloudwatch_event_rule.s3_object_created_transform.name
+  target_id = "SendToLambda"
+  arn       = aws_lambda_function.transform_function.arn
+}
 
 
 # resource "aws_lambda_permission" "allow_eventbridge_transform" {
