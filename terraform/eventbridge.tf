@@ -45,22 +45,22 @@ resource "aws_iam_role_policy_attachment" "eventbridge_lambda_attach" {
 
 ############################### TRANSFORM ##################################
 
-# #Rule for Ingestion Bucket
-# resource "aws_cloudwatch_event_rule" "s3_object_created_transform" {
-#   name        = "s3-eventbridge-rule-transform"
-#   description = "Capture S3 object created events"
-#   event_pattern = <<EOF
-# {
-#   "source": ["aws.s3"],
-#   "detail-type": ["Object Created"],
-#   "detail": {
-#     "bucket": {
-#       "name": ["etl-lullymore-west-ingested"]
-#     }
-#   }
-# }
-# EOF
-# }
+#Rule for Ingestion Bucket
+resource "aws_cloudwatch_event_rule" "s3_object_created_transform" {
+  name        = "s3-eventbridge-rule-transform"
+  description = "Capture S3 object created events"
+  event_pattern = <<EOF
+{
+  "source": ["aws.s3"],
+  "detail-type": ["Object Created"],
+  "detail": {
+    "bucket": {
+      "name": ["etl-lullymore-west-ingested"]
+    }
+  }
+}
+EOF
+}
 
 # #Lambda Target > Transform
 # resource "aws_cloudwatch_event_target" "lambda_target_transform" {
