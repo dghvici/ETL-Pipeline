@@ -60,29 +60,3 @@ resource "aws_cloudwatch_metric_alarm" "lambda_ingest_error_alarm" {
     ]
 }
 
-# Attach Policy to Role
-resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attachment" {
-    role       = aws_iam_role.cloudwatch_role.name
-    policy_arn = aws_iam_policy.cloudwatch_policy.arn
-}
-
-resource "aws_cloudwatch_event_rule" "every_half_hour" {
-  name                  = "EveryHalfHour"
-  description           = "Trigger Ingest Lambda function at the 0 and 30th minute of every hour" 
-  schedule_expression   = "cron(0,30 * * * ? *)"
-}
-
-resource "aws_cloudwatch_event_target" "target" {
-  rule      = aws_cloudwatch_event_rule.every_half_hour
-  target_id = ingest_lambda
-  arn       = aws_lambda_function.ingest_function.arn 
-
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch" {
-  statement_id  = "AllowExecutionFromCloudwatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.ingest_function.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.every_half_hour.arn
-}

@@ -7,8 +7,9 @@ import json
 
 # if os.getenv("ENV") == "development":
 from connection import connect_to_rds, close_rds
+
 # else:
-    # from util_func.python.connection import connect_to_rds, close_rds
+# from util_func.python.connection import connect_to_rds, close_rds
 
 
 ssm = boto3.client("ssm", "eu-west-2")
@@ -42,13 +43,17 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
             response = ssm.get_parameters(Names=[parameter_name])
         return response["Parameters"][0]["Value"]
     except IndexError:
-        logger.error("Parameter does not exist in Parameter Store\
-                     - ignore error if first invokation")
+        logger.error(
+            "Parameter does not exist in Parameter Store\
+                     - ignore error if first invokation"
+        )
         raise
 
 
 def format_raw_data_into_json(table_name, column_names, rows):
-    formatted_output = {table_name: {"column_names": column_names, "rows": rows}}
+    formatted_output = {
+        table_name: {"column_names": column_names, "rows": rows}
+    }
     json_output = json.dumps(formatted_output, default=str)
     return json_output
 
@@ -76,11 +81,11 @@ def check_database_updated():
     ]
 
     try:
-        timestamp_prev = retrieve_parameter(ssm, "timestamp_now") #1981
+        timestamp_prev = retrieve_parameter(ssm, "timestamp_now")  # 1981
         print(timestamp_prev, "prev in check database util")
-        timestamp_now = datetime.now() #2025
+        timestamp_now = datetime.now()  # 2025
         print(timestamp_now, "now in check database util")
-        put_current_time(ssm, str(timestamp_now)) #2025
+        put_current_time(ssm, str(timestamp_now))  # 2025
 
         conn = connect_to_rds()
         cur = conn.cursor()

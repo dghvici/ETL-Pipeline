@@ -35,6 +35,8 @@ requirements: create-environment
 	$(call execute_in_env, $(PIP) install -r ./requirements_lambda.txt -t modules/python)
 	$(call execute_in_env, $(GIT) clone https://github.com/jkehler/awslambda-psycopg2.git)
 	$(call execute_in_env, cp -r awslambda-psycopg2/psycopg2-3.11/* modules/python/)
+	$(call execute_in_env, $(PIP) install -r ./requirements_transform.txt -t modules_transform/python)
+
 
 
 #need to install the pycopg2 packages from github to get the aws lambda working:
@@ -67,7 +69,7 @@ run-flake8:
 
 # Run the unit tests
 unit-test:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvvrP)
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest ./test/*.py  ./test_utils/*.py -vvvrP )
 
 # Run the coverage check
 check-coverage:
@@ -76,6 +78,7 @@ check-coverage:
 
 # Run security tests
 run-security: security-test audit-test
+
 
 # Run formatting and tests
 run-checks: run-black run-docformatter run-flake8 unit-test check-coverage
