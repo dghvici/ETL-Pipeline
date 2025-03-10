@@ -1,4 +1,6 @@
-import os, boto3, psycopg2
+import os
+import boto3
+import psycopg2
 from botocore.exceptions import ClientError
 import json
 from dotenv import load_dotenv
