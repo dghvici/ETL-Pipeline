@@ -1,37 +1,30 @@
 import os
-# import sys
 import boto3
 import json
 from dotenv import load_dotenv
 import logging
-import pytz
 from datetime import datetime
-
 from botocore.exceptions import ClientError
 from util_func.python.connection import connect_to_rds, close_rds
 
-
 # Set this environment variable before running the script locally
-os.environ['ENV'] = 'local'  # or 'production' for Lambda
+os.environ["ENV"] = "local"  # or 'production' for Lambda
 
 if os.getenv("ENV") == "development":
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from connection import connect_to_rds, close_rds
-from ingest_utils import (
-    check_database_updated,
-    retrieve_parameter,
-)
-else:
-    sys.path.append(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    from util_func.python.connection import connect_to_rds, close_rds
+    from util_func.python.ingest_utils import (
+        check_database_updated,
+        retrieve_parameter,
     )
+else:
+    os.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from util_func.python.connection import connect_to_rds, close_rds
     from util_func.python.ingest_utils import (
         check_database_updated,
         retrieve_parameter,
     )
 
-ssm=boto3.client("ssm", "eu-west-2")
+ssm = boto3.client("ssm", "eu-west-2")
 
 # load env variables
 load_dotenv()  # conditional only happens if runs in test environment
@@ -74,5 +67,3 @@ def lambda_handler_ingest(event, context):
         raise Exception("An unexpected error occurred") from e
     finally:
         close_rds(conn)
-
-

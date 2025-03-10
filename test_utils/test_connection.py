@@ -1,10 +1,11 @@
 import os
-from unittest.mock import patch, MagicMock, Mock 
+from unittest.mock import patch, MagicMock, Mock
 import psycopg2
 from util_func.python.connection import connect_to_rds, close_rds, get_secret
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 ######################################################################
 class TestConnection:
@@ -24,7 +25,6 @@ class TestConnection:
         )
         assert connection is mock_connect.return_value
 
-
     @patch("psycopg2.connect")
     def test_connect_to_rds_connection_fails_operational_error(
         self, mock_connect, caplog
@@ -43,9 +43,10 @@ class TestConnection:
         assert connection is None
         assert "OperationalError connecting to RDS: mock error" in caplog.text
 
-
     @patch("psycopg2.connect")
-    def test_connect_to_rds_connection_fails_exception_error(self, mock_connect, caplog):
+    def test_connect_to_rds_connection_fails_exception_error(
+        self, mock_connect, caplog
+    ):
         mock_connect.side_effect = Exception(
             "Error connection to RDS: Connection error"
         )
@@ -61,7 +62,6 @@ class TestConnection:
         )
         assert connection is None
         assert "Error connection to RDS: Connection error" in caplog.text
-
 
     # retrive 1, 'USD' from currency table
 
@@ -101,7 +101,6 @@ class TestConnection:
         mock_cursor.fetchall.assert_called_once()
         mock_connection.close.assert_called_once()
 
-
     # def test_connection_retreives_Data_From_rds_database():
 
     #     db = connect_to_rds()
@@ -114,9 +113,8 @@ class TestConnection:
     #     close_rds(db)
 
 
-
-
 ######################################################################
+
 
 class TestCloseRds:
     @patch("psycopg2.connect")
@@ -125,7 +123,8 @@ class TestCloseRds:
 
         close_rds(mock_connect)
 
-        assert "Connection to RDS closed" in caplog.text 
+        assert "Connection to RDS closed" in caplog.text
+
 
 ######################################################################
 class TestGetSecret:
@@ -133,10 +132,10 @@ class TestGetSecret:
     def test_get_secret_happy_path(self, mock_boto_client):
         mock_secretmanager = Mock()
         mock_boto_client.return_value = mock_secretmanager
-        mock_secretmanager.get_secret_value= {
+        mock_secretmanager.get_secret_value = {
             "SecretString": {"username": "user", "password": "password"}
         }
-        assert get_secret("secret_name") == {"username": "user", "password": "password"}
-
-    
-
+        assert get_secret("secret_name") == {
+            "username": "user",
+            "password": "password",
+        }

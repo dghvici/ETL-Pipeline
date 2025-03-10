@@ -3,9 +3,7 @@ import boto3
 from datetime import datetime
 import logging
 
-from util_func.python.connection import (
-    connect_to_rds, close_rds
-)
+from util_func.python.connection import connect_to_rds, close_rds
 
 ssm = boto3.client("ssm", "eu-west-2")
 logger = logging.getLogger()
@@ -40,6 +38,7 @@ def put_current_time(ssm, timestamp_now):
     except ValueError:
         logger.error("Error: Invalid date format")
         raise
+
 
 def retrieve_parameter(ssm, parameter_name, **kwargs):
     try:

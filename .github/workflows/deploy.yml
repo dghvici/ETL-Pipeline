@@ -6,7 +6,7 @@ on:
       - '*'
   pull_request:
     branches:
-      - 'main' 
+      - 'main'
   workflow_dispatch:
     inputs:
       environment:
@@ -35,7 +35,7 @@ jobs:
     name: deploy-terraform
     runs-on: ubuntu-latest
     needs: run-tests
-    # strategy: 
+    # strategy:
     #   matrix:
     #     environment: [development, production]
     steps:
@@ -43,10 +43,10 @@ jobs:
         uses: actions/checkout@v4
       - name: setup Python
         uses: actions/setup-python@v5
-        with: 
+        with:
           python-version: '3.12.7'
       - name: Create environment
-        run: make requirements 
+        run: make requirements
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -55,7 +55,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: setup Terraform
         uses: hashicorp/setup-terraform@v3
-        with: 
+        with:
           terraform_version: 1.0.11
       - name: Terraform init
         working-directory: terraform
@@ -66,7 +66,7 @@ jobs:
       - name: Terraform Plan (Development)
         # if: matrix.environment == 'development'
         working-directory: terraform
-        run: terraform plan 
+        run: terraform plan
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
@@ -92,7 +92,7 @@ jobs:
       #     TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
       #     TF_VAR_port: ${{ secrets.PORT }}
       #     TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
-      #     TF_VAR_rds_host: ${{ secrets.RDS_HOST }}      
+      #     TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
 
       # - name: setup AWS credentials
       #   uses: aws-actions/configure-aws-credentials@v4
@@ -117,11 +117,10 @@ jobs:
       #   run: terraform fmt
       # - name: Terraform apply
       #   working-directory: terraform
-      #   run: terraform apply -auto-approve -input=false 
+      #   run: terraform apply -auto-approve -input=false
       #   env:
       #     TF_VAR_rds_user: ${{ secrets.RDS_USER }}
       #     TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
       #     TF_VAR_port: ${{ secrets.PORT }}
       #     TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
       #     TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
-      
