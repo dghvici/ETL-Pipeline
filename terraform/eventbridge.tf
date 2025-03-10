@@ -52,7 +52,7 @@ resource "aws_cloudwatch_event_rule" "s3_object_created_transform" {
   event_pattern = <<EOF
 {
   "source": ["aws.s3"],
-  "detail-type": ["Object Created"],
+  "detail-type": ["Object Access Tier Changed", "Object ACL Updated", "Object Created", "Object Deleted", "Object Restore Completed", "Object Restore Expired", "Object Restore Initiated", "Object Storage Class Changed", "Object Tags Added", "Object Tags Deleted"],
   "detail": {
     "bucket": {
       "name": ["etl-lullymore-west-ingested"]
@@ -67,6 +67,7 @@ resource "aws_cloudwatch_event_target" "lambda_target_transform" {
   rule      = aws_cloudwatch_event_rule.s3_object_created_transform.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.transform_function.arn
+  role_arn = aws_iam_role.eventbridge_role.arn
 }
 
 
