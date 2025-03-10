@@ -14,7 +14,7 @@ def lambda_handler_transform(event, context):
     source_key = event['Records'][0]['s3']['object']['key']
 
     # Trigger an S3 event (JSON file uploaded)- this will be the event
-    # Get the object from the event and show its content type\
+    # Get the object from the event and show its content type
     df_tables = {}
 
 # Load json data from bucket
@@ -25,10 +25,17 @@ def lambda_handler_transform(event, context):
 
     data = json.loads(file_content)
 
-    for table_name in data['New_data']:
-        df_tables[table_name] = \
-            pd.DataFrame(data[table_name]["rows"],
-                         columns=data[table_name]["column_names"])
+    # for table_name in data['New_data']:
+    #     df_tables[table_name] = \
+    #         pd.DataFrame(data[table_name]["rows"],
+    #                      columns=data[table_name]["column_names"])
+        
+
+    for table_dict in data['New_data']: 
+        for table_name, table_data in table_dict.items():  
+            df_tables[table_name] = pd.DataFrame(
+                table_data["rows"], columns=table_data["column_names"]
+        )
 
     final_dataframes = {}
 
