@@ -26,3 +26,4 @@ venv/
 **/*.tfstate*
 dependencies/
 packages/.terraform/
+modules/
