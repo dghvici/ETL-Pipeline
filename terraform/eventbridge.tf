@@ -79,7 +79,7 @@ resource "aws_cloudwatch_event_target" "lambda_target_transform" {
 #   source_arn    = aws_cloudwatch_event_rule.s3_object_created_transform.arn
 # }
 
-############################## LOAD ######################################
+############################## LOAD #####################################
 
 #Rule for Transformed Bucket
 resource "aws_cloudwatch_event_rule" "s3_object_created_load" {
