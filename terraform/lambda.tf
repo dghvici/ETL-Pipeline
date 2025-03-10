@@ -70,7 +70,7 @@ resource "aws_lambda_function" "load_function" {
 }
 
 
-# zipping the utils and modules separately
+# zipping the utils and modules separately.
 # below needs modifying and re-deploying and testing
 # utils folder may need to be utils/python - which would also impact other code
 data "archive_file" "modules_layer" {

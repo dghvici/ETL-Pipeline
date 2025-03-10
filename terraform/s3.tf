@@ -16,3 +16,4 @@ resource "aws_s3_bucket" "transform_bucket" {
     Name = "BucketForDataTransformation"
   }
 }
+
