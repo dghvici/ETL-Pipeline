@@ -28,14 +28,18 @@ def put_prev_time(ssm, timestamp_prev):
 
 
 def put_current_time(ssm, timestamp_now):
-    ssm.put_parameter(
-        Name="timestamp_now",
-        Description="Time database queried",
-        Value=timestamp_now,
-        Type="String",
-        Overwrite=True,
-    )
-
+    try:
+        datetime.fromisoformat(timestamp_now)
+        ssm.put_parameter(
+            Name="timestamp_now",
+            Description="Time database queried",
+            Value=timestamp_now,
+            Type="String",
+            Overwrite=True,
+        )
+    except ValueError:
+        logger.error("Error: Invalid date format")
+        raise
 
 def retrieve_parameter(ssm, parameter_name, **kwargs):
     try:

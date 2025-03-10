@@ -42,7 +42,7 @@ class TestPutPrevTime:
 
     def test_raises_value_error_for_invalid_date_format(
         self, ssm_client):
-        invalid_timestamp = "2001, 12, 1, 25, 1, 0"
+        invalid_timestamp = "2001-12-01T25:01:00"
         with pytest.raises(ValueError):
             put_prev_time(ssm_client, invalid_timestamp)
 
@@ -62,3 +62,9 @@ class TestPutCurrTime:
         put_current_time(ssm_client, timestamp_now)
         response = ssm_client.get_parameter(Name="timestamp_now")
         assert response["Parameter"]["Value"] == timestamp_now
+
+    def test_raises_value_error_for_invalid_time(
+        self, ssm_client):
+        invalid_timestamp = "2003-12-01T25:01:00"
+        with pytest.raises(ValueError):
+            put_current_time(ssm_client, invalid_timestamp)
