@@ -3,12 +3,9 @@ import boto3
 from datetime import datetime
 import logging
 
-
-# if os.getenv("ENV") == "development":
-from connection import connect_to_rds, close_rds
-# else:
-#     from util_func.python.connection import connect_to_rds, close_rds
-
+from util_func.python.connection import (
+    connect_to_rds, close_rds
+)
 
 ssm = boto3.client("ssm", "eu-west-2")
 logger = logging.getLogger()
@@ -16,13 +13,18 @@ logger.setLevel(logging.INFO)
 
 
 def put_prev_time(ssm, timestamp_prev):
-    ssm.put_parameter(
-        Name="timestamp_prev",
-        Description="Time database was last queried",
-        Value=timestamp_prev,
-        Type="String",
-        Overwrite=True,
-    )
+    try:
+        datetime.fromisoformat(timestamp_prev)
+        ssm.put_parameter(
+            Name="timestamp_prev",
+            Description="Time database was last queried",
+            Value=timestamp_prev,
+            Type="String",
+            Overwrite=True,
+        )
+    except ValueError:
+        logger.error("Error: Invalid date format")
+        raise
 
 
 def put_current_time(ssm, timestamp_now):
