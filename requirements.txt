@@ -14,3 +14,4 @@ psycopg2==2.9.10
 botocore==1.37.2
 pandas==2.2.3
 fastparquet==2024.11.0
+pytest-mock==3.14.0
