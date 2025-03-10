@@ -52,4 +52,28 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_attachment" {
 }
 
 
+# Parameter Store IAM 
 
+# Create 
+resource "aws_iam_policy" "ssm_policy" {
+  name   = "lambda_ssm_policy"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath",
+        "ssm:PutParameter",
+        "ssm:DeleteParameter"
+      ],
+      Effect   = "Allow",
+      Resource = "*"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.ssm_policy.arn
+}

@@ -41,20 +41,22 @@ resource "aws_sns_topic_subscription" "cloudwatch_alarm_subscription" {
   endpoint      = "lullymorewestalerts@gmail.com"
 }
 
-# Cloudwatch Alarm
+# CloudWatch Alarm
 resource "aws_cloudwatch_metric_alarm" "lambda_ingest_error_alarm" {
-  alarm_name                = "LambdaIngestErrorAlarm"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
-  metric_name               = aws_cloudwatch_log_metric_filter.lambda_ingest_metric_filter.metric_transformation[0].name
-  namespace                 = aws_cloudwatch_log_metric_filter.lambda_ingest_metric_filter.metric_transformation[0].namespace
-  period                    = "60"
-  statistic                 = "Sum"
-  threshold                 = "1"
+    alarm_name           = "LambdaIngestErrorAlarm"
+    comparison_operator  = "GreaterThanOrEqualToThreshold"
+    evaluation_periods   = "1"
+    metric_name          = aws_cloudwatch_log_metric_filter.lambda_ingest_metric_filter.metric_transformation[0].name
+    namespace            = aws_cloudwatch_log_metric_filter.lambda_ingest_metric_filter.metric_transformation[0].namespace
+    period               = "60"
+    statistic            = "Sum"
+    threshold            = "1"
 
-  alarm_description         = "Alarm when Lambda ingest function errors exceed 1"
-  actions_enabled           = true
+    alarm_description    = "Alarm when Lambda ingest function errors exceed 1"
+    actions_enabled      = true
 
-  alarm_actions             = [
-    aws_cloudwatch_log_group.lambda_ingest_log_group.arn]
+    alarm_actions        = [
+        aws_sns_topic.cloudwatch_ingest_alarm_topic.arn
+    ]
 }
+
