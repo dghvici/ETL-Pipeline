@@ -18,7 +18,7 @@ resource "aws_iam_role" "eventbridge_role" {
 EOF
 }
 
-#Attaching Permissions to Invoke Lambdas (ingest AND transform)
+#Attaching Permissions to Invoke Lambda (ingest AND transform)
 resource "aws_iam_policy" "eventbridge_lambda_policy" {
   name        = "EventBridgeLambdaInvokePolicy"
   description = "Allows EventBridge to invoke Lambda"
