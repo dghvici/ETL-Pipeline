@@ -37,11 +37,6 @@ requirements: create-environment
 	$(call execute_in_env, cp -r awslambda-psycopg2/psycopg2-3.11/* modules/python/)
 	$(call execute_in_env, $(PIP) install -r ./requirements_transform.txt -t modules_transform/python)
 
-
-
-#need to install the pycopg2 packages from github to get the aws lambda working:
-#https://github.com/jkehler/awslambda-psycopg2/tree/master/psycopg2-3.11
-
 # Run the security test (bandit)
 security-test:
 	$(call execute_in_env, bandit -lll ./src/*.py ./test/*.py \

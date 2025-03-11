@@ -18,7 +18,6 @@ terraform {
   }
 }
 
-
 provider "aws" {
   region = "eu-west-2"
 
@@ -29,7 +28,6 @@ provider "aws" {
     }
   }
 }
-
 
 data "aws_caller_identity" "current" {}
 

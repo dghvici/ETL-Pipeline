@@ -1,6 +1,4 @@
 import pandas as pd
-
-# import fastparquet
 import json
 import boto3
 from datetime import datetime as dt
@@ -16,6 +14,26 @@ ssm = boto3.client("ssm", "eu-west-2")
 
 
 def put_last_sales_record_id(ssm, sales_record_id):
+    """Stores the last sales record ID in AWS SSM Parameter Store.
+
+    This function uploads sales_record_id to AWS SSM Parameter Store as a
+    parameter with the name last_sales_record_id.
+
+    Args:
+        ssm:
+            A boto3 client used to interact with the AWS Parameter Store.
+        sales_record_id:
+            The sales record ID to be stored in the Parameter Store.
+
+    Returns:
+        None: This function does not return any value.
+              It stores the sales record ID in the Parameter Store.
+
+    Raises:
+        botocore.exceptions.ClientError:
+            If there is an error during the interaction with SSM,
+            a ClientError will be raised.
+    """
     ssm.put_parameter(
         Name="last_sales_record_id",
         Description="last sales record id uploaded to transformed bucket",
@@ -26,6 +44,28 @@ def put_last_sales_record_id(ssm, sales_record_id):
 
 
 def retrieve_sales_record_id(ssm, sales_record_id, **kwargs):
+    """This function fetches a parameter value from AWS SSM Parameter Store
+    based on the provided sales record ID. It attempts to retrieve the
+    value associated with the parameter name.
+    If the parameter does not exist, it logs an error and raises an exception.
+
+    Args:
+        ssm:
+            A boto3 client used to interact with the AWS Parameter Store.
+        sales_record_id:
+            The name of the parameter in Parameter
+            Store that holds the sales record ID.
+        **kwargs:
+            Any additional keyword arguments to be passed.
+
+    Returns:
+        The value of the sales record ID retrieved from the
+        SSM Parameter Store.
+
+    Raises:
+        IndexError: If the parameter does not exist in Parameter Store,
+        an `IndexError` will be raised, and an error message will be logged.
+    """
     try:
         response = ssm.get_parameters(Names=[sales_record_id])
         return response["Parameters"][0]["Value"]
@@ -35,6 +75,19 @@ def retrieve_sales_record_id(ssm, sales_record_id, **kwargs):
 
 
 def get_currency(currency):
+    """Returns the name of the currency based on its code.
+
+    This function takes a currency code (e.g., "GBP", "EUR", "USD") and
+    returns the name of the currency (e.g., "pound", "euro", "dollar").
+    If the currency code is not recognized, it returns "other".
+
+    Args:
+        currency: The currency code (e.g., "GBP", "EUR", "USD").
+
+    Returns:
+        The name of the currency corresponding to the input code.
+        If the code is not recognized, returns "other".
+    """
     if currency == "GBP":
         return "pound"
     elif currency == "EUR":
@@ -46,7 +99,28 @@ def get_currency(currency):
 
 
 def create_dataframes(df_tables):
+    """Transforms and creates fact and dimension dataframes based
+       on input tables.
+
+    This function takes a dictionary of dataframes (df_tables).
+    The function processes the data, performs necessary transformations,
+    and generates fact and dimension dataframes for use in a star schema.
+
+    Args:
+        df_tables: A dictionary where the keys are table names and the
+        values contain the data for each table.
+
+    Returns:
+        dict: A dictionary of transformed dataframes:
+            - "df_fact_sales_order": The fact table for sales orders.
+            - "df_dim_staff": The dimension table for staff.
+            - "df_dim_location": The dimension table for locations.
+            - "df_dim_design": The dimension table for designs.
+            - "df_dim_currency": The dimension table for currencies.
+            - "df_dim_counterparty": The dimension table for counterparties.
+    """
     final_dataframes = {}
+
     if "sales_order" in df_tables:
         df_sales_order = df_tables["sales_order"]
 
@@ -97,7 +171,9 @@ def create_dataframes(df_tables):
         df_fact_sales_order["agreed_delivery_location_id"] = df_sales_order[
             "agreed_delivery_location_id"
         ]
-        # sales_record_id needs to be stored externally e.g. parameter store.
+
+        # TO IMPLEMENT:
+        # sales_record_id needs to be stored externally via parameter store
         # so the number can continue on each lambda invocation.
         # retrieve at the beginning - in a try block(everything)
         # 1st time: goes into except block and puts to 1
@@ -219,6 +295,20 @@ def create_dataframes(df_tables):
 
 
 def create_dim_date():
+    """This function generates a dataframe containing a date range
+       from 1980 to 2040 with columns representing various date attributes.
+
+    Returns:
+        pd.DataFrame: A DataFrame with the following columns:
+            - date_id: The date (from 1980-01-01 to 2040-12-31)
+            - year: The year of the date
+            - month: The month of the date (1-12)
+            - day: The day of the month (1-31)
+            - day_of_week: The weekday index (0=Monday, 6=Sunday)
+            - day_name: The name of the day (e.g., "Monday")
+            - month_name: The name of the month (e.g., "January")
+            - quarter: The quarter of the year (1-4)
+    """
     df_dim_date = pd.DataFrame(
         pd.date_range(start="1980-01-01", end="2040-12-31", freq="D"),
         columns=["date_id"],
@@ -234,6 +324,26 @@ def create_dim_date():
 
 
 def lambda_handler_transform(event, context):
+    """Handles the transformation of data from an ingest S3 bucket,
+       processes it into dataframes,
+       applies transformations to create a new star schema,
+       and uploads the transformed data to a designated S3 bucket.
+
+    Args:
+        event: s3 event message in JSON format, containing a record of the
+        objects put into the ingest s3 bucket during the
+        lambda_handler_ingest run
+        context: supplied by AWS
+
+    Returns:
+        None: This function does not return a value.
+        The transformed data is uploaded directly to S3.
+
+    Raises:
+        Exception:
+            If there is an error during the S3 interaction or any
+            unexpected issue occurs, an exception is raised.
+    """
     try:
         s3 = boto3.client("s3")
 
@@ -270,6 +380,28 @@ def lambda_handler_transform(event, context):
 
 
 def upload_dataframes_to_s3(dataframes_dict, transform_bucket):
+    """This function takes a dictionary of DataFrames generated
+       by the lambda_handler_transform function, converts each
+       DataFrame to Parquet format and uploads them to the provided
+       S3 bucket. The files are organized by year and month in the
+       S3 bucket, with each file named using the table name and timestamp.
+
+    Args:
+        dataframes_dict:
+            A dictionary of dataframes created by lambda_handler_transform.
+        transform_bucket:
+            The name of the target S3 bucket where the Parquet
+            files will be uploaded.
+
+    Returns:
+        str: A success message indicating that all DataFrames
+             have been uploaded to S3.
+
+    Raises:
+        Exception: If there is an error while uploading the data to S3,
+                   an exception will be raised.
+    """
+
     s3 = boto3.client("s3")
 
     year = dt.now().year
