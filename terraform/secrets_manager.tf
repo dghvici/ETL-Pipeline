@@ -23,7 +23,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_version" {
 }
 
 resource "aws_secretsmanager_secret" "rds_name" {
-  
+
   name                    = "rds_name"
   recovery_window_in_days = 0
   kms_key_id              = aws_kms_key.local_key.id
