@@ -1,6 +1,5 @@
 # Lambda IAM Role
 
-# Define
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
@@ -14,7 +13,6 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-# Create
 resource "aws_iam_role" "iam_for_lambda" {
   name               = "iam_for_lambda"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -22,7 +20,6 @@ resource "aws_iam_role" "iam_for_lambda" {
 
 # Lambda IAM Policy for S3 Write
 
-# Define
 data "aws_iam_policy_document" "s3_document" {
   statement {
     actions = [
@@ -38,25 +35,22 @@ data "aws_iam_policy_document" "s3_document" {
 }
 
 
-# Create
 resource "aws_iam_policy" "s3_policy" {
   name_prefix = "s3-policy-terrific-totes-lambda-"
   policy      = data.aws_iam_policy_document.s3_document.json
 }
 
 
-# Attach
 resource "aws_iam_role_policy_attachment" "lambda_s3_attachment" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = aws_iam_policy.s3_policy.arn
 }
 
 
-# Parameter Store IAM 
+# Parameter Store IAM
 
-# Create 
 resource "aws_iam_policy" "ssm_policy" {
-  name   = "lambda_ssm_policy"
+  name = "lambda_ssm_policy"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{

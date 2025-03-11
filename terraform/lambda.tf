@@ -19,7 +19,6 @@ data "archive_file" "load_lambda" {
   source_file = "${path.module}/../src/lambda_load.py"
 }
 
-
 resource "aws_lambda_function" "ingest_function" {
   filename      = data.archive_file.ingest_lambda.output_path
   function_name = var.ingest_lambda
@@ -37,7 +36,6 @@ resource "aws_lambda_function" "ingest_function" {
       RDS_HOST        = var.rds_host
       PORT            = var.port
       S3_BUCKET_NAME = aws_s3_bucket.ingestion_bucket.bucket
-      
     }
   }
 }
@@ -69,10 +67,7 @@ resource "aws_lambda_function" "load_function" {
   source_code_hash = data.archive_file.load_lambda.output_base64sha512
 }
 
-
 # zipping the utils and modules separately.
-# below needs modifying and re-deploying and testing
-# utils folder may need to be utils/python - which would also impact other code
 data "archive_file" "modules_layer" {
   type        = "zip"
   output_file_mode = "0666"
@@ -92,7 +87,6 @@ data "archive_file" "utils_layer" {
   output_file_mode = "0666"
   output_path = "${path.module}/../packages/layers/utils.zip"
   source_dir = "${path.module}/../util_func/"
-  
 }
 
 resource "aws_lambda_layer_version" "utils_layer" {

@@ -1,5 +1,3 @@
-# https://developer.hashicorp.com/terraform/language/values/variables
-
 variable "ingest_lambda" {
   type    = string
   default = "Ingest-Lambda"
@@ -25,7 +23,7 @@ variable "state_machine_name" {
   default = "Terrific-Totes-SNS"
 }
 
-#SecretManager secrets variables
+#SecretManager Variables
 variable "rds_user" {
   description = "The rds_user"
   type        = string
@@ -60,12 +58,3 @@ variable "rds_name" {
   sensitive   = true
   default     = "default"
 }
-
-# variable "environment" {
-#   description = "The environment (development or production)"
-#   type        = string
-# }
-
-# variable "S3_BUCKET_PREFIX" {
-#   type = string
-# }

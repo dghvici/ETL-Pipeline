@@ -26,15 +26,15 @@ resource "aws_iam_policy" "eventbridge_lambda_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-        {
+      {
         Action = [
-            "lambda:InvokeFunction",
+          "lambda:InvokeFunction",
         ]
-        Effect      = "Allow",
-        Resource    = "*"
-        },
-        ]
-    })
+        Effect   = "Allow",
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 #Lambda Policy attachment to IAM (from above)
@@ -47,8 +47,8 @@ resource "aws_iam_role_policy_attachment" "eventbridge_lambda_attach" {
 
 #Rule for Ingestion Bucket
 resource "aws_cloudwatch_event_rule" "s3_object_created_transform" {
-  name        = "s3-eventbridge-rule-transform"
-  description = "Capture S3 object created events"
+  name          = "s3-eventbridge-rule-transform"
+  description   = "Capture S3 object created events"
   event_pattern = <<EOF
 {
   "source": ["aws.s3"],
@@ -67,10 +67,10 @@ resource "aws_cloudwatch_event_target" "lambda_target_transform" {
   rule      = aws_cloudwatch_event_rule.s3_object_created_transform.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.transform_function.arn
-  role_arn = aws_iam_role.eventbridge_role.arn
+  role_arn  = aws_iam_role.eventbridge_role.arn
 }
 
-
+#CODE UNUSED BUT COULD BE USEFUL. DECIDED TO USE S3 NOTIFICATION TRIGGER INSTEAD.
 # resource "aws_lambda_permission" "allow_eventbridge_transform" {
 #   statement_id  = "AllowExecutionFromEventBridge"
 #   action        = "lambda:InvokeFunction"
@@ -83,8 +83,8 @@ resource "aws_cloudwatch_event_target" "lambda_target_transform" {
 
 #Rule for Transformed Bucket
 resource "aws_cloudwatch_event_rule" "s3_object_created_load" {
-  name        = "s3-eventbridge-rule-load"
-  description = "Capture S3 object created events"
+  name          = "s3-eventbridge-rule-load"
+  description   = "Capture S3 object created events"
   event_pattern = <<EOF
 {
   "source": ["aws.s3"],

@@ -1,23 +1,16 @@
-# Cloudwatch log group - defines CW log group for Lambda function
-# cloudwatch log stream - for log function
-# cloudwatch metric filter - capture function errors 
-# cloudwatch alarm - alram triggers which exceed set threshold >90%? 
-
-# outputs.tf file 
-
-# Cloudwatch log group 
+# Cloudwatch log group
 resource "aws_cloudwatch_log_group" "lambda_ingest_log_group" {
   name              = aws_s3_bucket.ingestion_bucket.bucket
   retention_in_days = 14
 }
 
-# Cloudwatch log stream 
+# Cloudwatch log stream
 resource "aws_cloudwatch_log_stream" "lambda_ingest_log_stream" {
   name              = "lambda_ingest_log_stream"
   log_group_name    = aws_cloudwatch_log_group.lambda_ingest_log_group.name
 }
 
-# Cloudwatch metric filter 
+# Cloudwatch metric filter
 resource "aws_cloudwatch_log_metric_filter" "lambda_ingest_metric_filter" {
   name             = "lambda_ingest_metric_filter"
   log_group_name   = aws_cloudwatch_log_group.lambda_ingest_log_group.name
@@ -34,7 +27,7 @@ resource "aws_sns_topic" "cloudwatch_ingest_alarm_topic" {
   name = "cloudwatch-ingest-alarm-topic"
 }
 
-# SNS to Gmail 
+# SNS to Gmail
 resource "aws_sns_topic_subscription" "cloudwatch_alarm_subscription" {
   topic_arn     = aws_sns_topic.cloudwatch_ingest_alarm_topic.arn
   protocol      = "email"
