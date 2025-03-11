@@ -19,8 +19,19 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-######################################################################
 def connect_to_rds(raise_exception=False):
+    """connects to Totesys AWS Rational Database Service (RDS) database.
+    Note: locally, credentials are supplied by product owner and stored
+    locally in gitignored .env. For production, these credentials are
+    stored in GitHub Secrets and passed to AWS Sectrets Manager, which
+    are is used in place of the .env.
+
+    Errors are logged and raised if there is an problem connecting
+    to the database.
+
+    Returns:
+        connection: connection to totesys RDS database
+    """
     try:
         connection = psycopg2.connect(
             user=os.getenv("RDS_USER"),
@@ -30,7 +41,6 @@ def connect_to_rds(raise_exception=False):
             port=os.getenv("PORT"),
         )
         logger.info("Successfully connected to RDS")
-        # logger.info(os.getenv("RDS_NAME"))
         return connection
     except psycopg2.OperationalError as op_error:
         logger.error(f"OperationalError connecting to RDS: {op_error}")
@@ -44,8 +54,13 @@ def connect_to_rds(raise_exception=False):
         return None
 
 
-######################################################################
 def close_rds(conn):
+    """function to close the connection to the RDS database.
+    Logs an error if connection is already closed.
+
+    Args:
+        conn (connection): connection instance to the database.
+    """
     if conn is not None:
         conn.close()
         logger.info("Connection to RDS closed")
@@ -53,8 +68,19 @@ def close_rds(conn):
         logger.error("Connection to RDS is already closed")
 
 
-######################################################################
 def get_secret(secret_name):
+    """function to get a secret from the AWS Secrets Manager.
+
+    Raises an error if there is a problem retrieving the secret
+    (i.e. issue connecting to Secrets Manager or if secretId
+    incorrect).
+
+    Args:
+        secret_name (str): string representing the SecretId
+
+    Returns:
+        The value of the secret.
+    """
     try:
         response = secretsmanager.get_secret_value(SecretId=secret_name)
         return json.loads(response["SecretString"])

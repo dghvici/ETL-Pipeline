@@ -1,15 +1,13 @@
 import os
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock
 import psycopg2
 import pytest
-from util_func.python.connection import connect_to_rds, close_rds, get_secret
-from botocore.exceptions import ClientError
+from util_func.python.connection import connect_to_rds, close_rds
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-######################################################################
 class TestConnection:
     @patch("psycopg2.connect")
     def test_connect_to_rds_success(self, mock_connect):
@@ -53,7 +51,7 @@ class TestConnection:
             "Error connection to RDS: Connection error"
         )
 
-        connection = connect_to_rds()
+        connect_to_rds()
 
         mock_connect.assert_called_once_with(
             user=os.getenv("RDS_USER"),
@@ -64,10 +62,6 @@ class TestConnection:
         )
         with pytest.raises(Exception):
             raise None
-        # assert connection is None
-        # assert "Error connection to RDS: Connection error" in caplog.text
-
-    # retrive 1, 'USD' from currency table
 
     @patch("psycopg2.connect")
     def test_search_rds(self, mock_connect):
@@ -106,8 +100,6 @@ class TestConnection:
         mock_connection.close.assert_called_once()
 
 
-######################################################################
-
 class TestCloseRds:
     @patch("psycopg2.connect")
     def test_close_rds_closes_database_connection(self, mock_connect, caplog):
@@ -116,5 +108,3 @@ class TestCloseRds:
         close_rds(mock_connect)
 
         assert "Connection to RDS closed" in caplog.text
-
-

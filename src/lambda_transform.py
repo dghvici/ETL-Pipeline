@@ -139,21 +139,25 @@ def create_dataframes(df_tables):
         )
 
         df_fact_sales_order = pd.DataFrame()
-        df_fact_sales_order["sales_order_id"] \
-            = df_sales_order["sales_order_id"]
-        df_fact_sales_order["created_date"] \
-            = df_sales_order["created_at"].dt.date
-        df_fact_sales_order["created_time"] \
-            = df_sales_order["created_at"].dt.time
-        df_fact_sales_order["last_updated_date"] \
-            = df_sales_order[
-            "last_updated"].dt.date
+        df_fact_sales_order["sales_order_id"] = df_sales_order[
+            "sales_order_id"
+        ]
+        df_fact_sales_order["created_date"] = df_sales_order[
+            "created_at"
+        ].dt.date
+        df_fact_sales_order["created_time"] = df_sales_order[
+            "created_at"
+        ].dt.time
+        df_fact_sales_order["last_updated_date"] = df_sales_order[
+            "last_updated"
+        ].dt.date
         df_fact_sales_order["last_updated_time"] = df_sales_order[
             "last_updated"
         ].dt.time
         df_fact_sales_order["sales_staff_id"] = df_sales_order["staff_id"]
-        df_fact_sales_order["counterparty_id"] \
-            = df_sales_order["counterparty_id"]
+        df_fact_sales_order["counterparty_id"] = df_sales_order[
+            "counterparty_id"
+        ]
         df_fact_sales_order["units_sold"] = df_sales_order["units_sold"]
         df_fact_sales_order["unit_price"] = df_sales_order["unit_price"]
         df_fact_sales_order["currency_id"] = df_sales_order["currency_id"]
@@ -171,9 +175,13 @@ def create_dataframes(df_tables):
         # TO IMPLEMENT:
         # sales_record_id needs to be stored externally via parameter store
         # so the number can continue on each lambda invocation.
-
-        df_fact_sales_order["sales_records_id"] \
-            = range(1, len(df_fact_sales_order) + 1)
+        # retrieve at the beginning - in a try block(everything)
+        # 1st time: goes into except block and puts to 1
+        # be used in range
+        # max sent back as variable
+        df_fact_sales_order["sales_records_id"] = range(
+            1, len(df_fact_sales_order) + 1
+        )
         df_fact_sales_order = df_fact_sales_order[
             [
                 "sales_records_id",
@@ -255,8 +263,9 @@ def create_dataframes(df_tables):
         df_address = df_tables["address"]
 
         df_dim_counterparty = pd.DataFrame()
-        df_dim_counterparty[
-            "counterparty_id"] = df_counterparty["counterparty_id"]
+        df_dim_counterparty["counterparty_id"] = df_counterparty[
+            "counterparty_id"
+        ]
         df_dim_counterparty["counterparty_legal_name"] = df_counterparty[
             "counterparty_legal_name"
         ]
@@ -264,16 +273,21 @@ def create_dataframes(df_tables):
             "address_line_1"
         ]
         df_dim_counterparty["counterparty_legal_address_line_2"] = df_address[
-            "address_line_2"]
+            "address_line_2"
+        ]
         df_dim_counterparty["counterparty_legal_district"] = df_address[
-            "district"]
+            "district"
+        ]
         df_dim_counterparty["counterparty_legal_city"] = df_address["city"]
         df_dim_counterparty["counterparty_legal_postal_code"] = df_address[
-            "postal_code"]
+            "postal_code"
+        ]
         df_dim_counterparty["counterparty_legal_country"] = df_address[
-            "country"]
-        df_dim_counterparty[
-            "counterparty_legal_phone_number"] = df_address["phone"]
+            "country"
+        ]
+        df_dim_counterparty["counterparty_legal_phone_number"] = df_address[
+            "phone"
+        ]
 
         final_dataframes["df_dim_counterparty"] = df_dim_counterparty
 
@@ -355,7 +369,8 @@ def lambda_handler_transform(event, context):
         upload_dataframes_to_s3(final_dataframes, transform_bucket)
         logger.info(
             "All data has been transformed \
-                and uploaded to s3 transform bucket")
+                and uploaded to s3 transform bucket"
+        )
     except ClientError as e:
         logger.error(f"ClientError: {str(e)}")
         raise Exception("Error interacting with AWS services") from e
