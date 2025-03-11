@@ -4,6 +4,7 @@ from datetime import datetime
 import logging
 import json
 
+<<<<<<< HEAD
 
 # if os.getenv("ENV") == "development":
 from connection import connect_to_rds, close_rds
@@ -11,6 +12,9 @@ from connection import connect_to_rds, close_rds
 # else:
 # from util_func.python.connection import connect_to_rds, close_rds
 
+=======
+from util_func.python.connection import connect_to_rds, close_rds
+>>>>>>> a2b6426fc63cbe40742628496d817680565fca58
 
 ssm = boto3.client("ssm", "eu-west-2")
 logger = logging.getLogger()
@@ -18,23 +22,33 @@ logger.setLevel(logging.INFO)
 
 
 def put_prev_time(ssm, timestamp_prev):
-    ssm.put_parameter(
-        Name="timestamp_prev",
-        Description="Time database was last queried",
-        Value=timestamp_prev,
-        Type="String",
-        Overwrite=True,
-    )
+    try:
+        datetime.fromisoformat(timestamp_prev)
+        ssm.put_parameter(
+            Name="timestamp_prev",
+            Description="Time database was last queried",
+            Value=timestamp_prev,
+            Type="String",
+            Overwrite=True,
+        )
+    except ValueError:
+        logger.error("Error: Invalid date format")
+        raise
 
 
 def put_current_time(ssm, timestamp_now):
-    ssm.put_parameter(
-        Name="timestamp_now",
-        Description="Time database queried",
-        Value=timestamp_now,
-        Type="String",
-        Overwrite=True,
-    )
+    try:
+        datetime.fromisoformat(timestamp_now)
+        ssm.put_parameter(
+            Name="timestamp_now",
+            Description="Time database queried",
+            Value=timestamp_now,
+            Type="String",
+            Overwrite=True,
+        )
+    except ValueError:
+        logger.error("Error: Invalid date format")
+        raise
 
 
 def retrieve_parameter(ssm, parameter_name, **kwargs):
@@ -81,11 +95,17 @@ def check_database_updated():
     ]
 
     try:
+<<<<<<< HEAD
         timestamp_prev = retrieve_parameter(ssm, "timestamp_now")  # 1981
         print(timestamp_prev, "prev in check database util")
         timestamp_now = datetime.now()  # 2025
         print(timestamp_now, "now in check database util")
         put_current_time(ssm, str(timestamp_now))  # 2025
+=======
+        timestamp_prev = retrieve_parameter(ssm, "timestamp_now")
+        timestamp_now = datetime.now()
+        put_current_time(ssm, str(timestamp_now))
+>>>>>>> a2b6426fc63cbe40742628496d817680565fca58
 
         conn = connect_to_rds()
         cur = conn.cursor()

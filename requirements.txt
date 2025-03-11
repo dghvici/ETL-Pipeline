@@ -12,8 +12,12 @@ dotenv==0.9.9
 psycopg2-binary==2.9.10
 psycopg2==2.9.10
 botocore==1.37.2
+<<<<<<< HEAD
 sqlalchemy==2.0.38
 pyarrow==19.0.1
 pandas==2.2.3
 fastparquet==2024.11.0
 pytest-mock==3.14.0
+=======
+pytz==2023.3
+>>>>>>> a2b6426fc63cbe40742628496d817680565fca58
