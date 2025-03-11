@@ -1,6 +1,8 @@
-import os, boto3, psycopg2
+import os
+import boto3
+import psycopg2
 from botocore.exceptions import ClientError
-import json 
+import json
 from dotenv import load_dotenv
 import logging
 
@@ -41,6 +43,7 @@ def connect_to_rds(raise_exception=False):
             raise
         return None
 
+
 ######################################################################
 def close_rds(conn):
     if conn is not None:
@@ -48,6 +51,7 @@ def close_rds(conn):
         logger.info("Connection to RDS closed")
     else:
         logger.error("Connection to RDS is already closed")
+
 
 ######################################################################
 def get_secret(secret_name):
@@ -57,4 +61,3 @@ def get_secret(secret_name):
     except ClientError as e:
         logger.error(f"Error retrieving secret {secret_name}: {e}")
         raise e
-    
