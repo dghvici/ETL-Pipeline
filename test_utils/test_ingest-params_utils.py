@@ -10,7 +10,6 @@ from util_func.python.ingest_utils import (
     check_database_updated,
 )
 
-
 @pytest.fixture(scope="function")
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
@@ -20,12 +19,10 @@ def aws_credentials():
     os.environ["AWS_SESSION_TOKEN"] = "testing"
     os.environ["AWS_DEFAULT_REGION"] = "eu-west-2"
 
-
 @pytest.fixture(scope="function")
 def ssm_client(aws_credentials):
     with mock_aws():
         yield boto3.client("ssm", region_name="eu-west-2")
-
 
 class TestRetrieveParameter:
     def test_retreieve_param_retrieves_param_and_returns_string(
@@ -46,7 +43,6 @@ class TestRetrieveParameter:
     ):
         with pytest.raises(IndexError):
             retrieve_parameter(ssm_client, "non_existent_param")
-
 
 class TestCheckDatabaseUpdated:
     @patch("util_func.python.ingest_utils.connect_to_rds")
