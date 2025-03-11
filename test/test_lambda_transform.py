@@ -199,10 +199,12 @@ class TestDimDate:
 
 class TestLambdaHandler:
     def test_lambda_handler_gets_object_from_s3_bucket(
-            self, aws_credentials, mocker):
+        self, aws_credentials, mocker
+    ):
         with mock_aws():
             mock_upload = mocker.patch(
-                "src.lambda_transform.upload_dataframes_to_s3")
+                "src.lambda_transform.upload_dataframes_to_s3"
+            )
             bucket_name = "test_bucket"
             s3_client = boto3.client("s3")
             s3_client.create_bucket(
@@ -242,7 +244,7 @@ class TestLambdaHandler:
             s3_client.put_object(
                 Bucket=bucket_name,
                 Key="test_data",
-                Body=json.dumps(dummy_data)
+                Body=json.dumps(dummy_data),
             )
             dummy_event = {
                 "Records": [
@@ -268,7 +270,8 @@ class TestUploadToS3:
                 CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
             )
             test_df = pd.DataFrame(
-                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]})
+                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]}
+            )
             test_df_dict = {"test_table": test_df}
             result = upload_dataframes_to_s3(test_df_dict, bucket_name)
             assert result == "All dataframes uploaded successfully"
@@ -279,12 +282,13 @@ class TestUploadToS3:
             s3_client = boto3.client("s3")
             s3_client.create_bucket(
                 Bucket=bucket_name,
-                CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},)
+                CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+            )
             test_df = pd.DataFrame(
-                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]})
+                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]}
+            )
             test_df_dict = {"test_table": test_df}
-            upload_dataframes_to_s3(
-                test_df_dict, bucket_name)
+            upload_dataframes_to_s3(test_df_dict, bucket_name)
             objects = s3_client.list_objects_v2(Bucket=bucket_name)
             obj_keys = [obj["Key"] for obj in objects["Contents"]]
             assert "test_table" in obj_keys[0]
@@ -298,11 +302,12 @@ class TestUploadToS3:
                 CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
             )
             test_df = pd.DataFrame(
-                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]})
+                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]}
+            )
             test_df_2 = pd.DataFrame(
-                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]})
-            test_df_dict = {
-                "test_table": test_df, "test_table_2": test_df_2}
+                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]}
+            )
+            test_df_dict = {"test_table": test_df, "test_table_2": test_df_2}
             upload_dataframes_to_s3(test_df_dict, bucket_name)
             objects = s3_client.list_objects_v2(Bucket=bucket_name)
             obj_keys = [obj["Key"] for obj in objects["Contents"]]
@@ -319,9 +324,11 @@ class TestUploadToS3:
                 CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
             )
             test_df = pd.DataFrame(
-                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]})
+                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]}
+            )
             test_df_2 = pd.DataFrame(
-                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]})
+                {"col1": ["A", "B", "C"], "col2": ["E", "F", "G"]}
+            )
             test_df_dict = {"test_table": test_df, "test_table_2": test_df_2}
             upload_dataframes_to_s3(test_df_dict, bucket_name)
             objects = s3_client.list_objects_v2(Bucket=bucket_name)

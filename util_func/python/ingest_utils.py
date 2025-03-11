@@ -1,20 +1,9 @@
-# import os
 import boto3
 from datetime import datetime
 import logging
 import json
 
-<<<<<<< HEAD
-
-# if os.getenv("ENV") == "development":
-from connection import connect_to_rds, close_rds
-
-# else:
-# from util_func.python.connection import connect_to_rds, close_rds
-
-=======
 from util_func.python.connection import connect_to_rds, close_rds
->>>>>>> a2b6426fc63cbe40742628496d817680565fca58
 
 ssm = boto3.client("ssm", "eu-west-2")
 logger = logging.getLogger()
@@ -22,6 +11,14 @@ logger.setLevel(logging.INFO)
 
 
 def put_prev_time(ssm, timestamp_prev):
+    """function to put previous timestamp into the ssm
+    parameter store, for use in the lambda_ingest function.
+    Logs an error if the date is in the wrong format.
+
+    Args:
+        ssm (client): ssm client for AWS
+        timestamp_prev (str): previous timestamp as a string
+    """
     try:
         datetime.fromisoformat(timestamp_prev)
         ssm.put_parameter(
@@ -37,6 +34,14 @@ def put_prev_time(ssm, timestamp_prev):
 
 
 def put_current_time(ssm, timestamp_now):
+    """function to put the current timestamp into the ssm
+    parameter store, for use in the lambda_ingest function.
+    Logs an error if the date is in the wrong format.
+
+    Args:
+        ssm (client): ssm client for AWS
+        timestamp_now (str): current timestamp as a string
+    """
     try:
         datetime.fromisoformat(timestamp_now)
         ssm.put_parameter(
@@ -52,6 +57,22 @@ def put_current_time(ssm, timestamp_now):
 
 
 def retrieve_parameter(ssm, parameter_name, **kwargs):
+    """function to retrieve a parameter from the parameter
+    store. Main use case for retrieving timestamp_prev and
+    timestamp_now.
+
+    Logs an error and raises and IndexError
+    if the parameter does not exist - this can be ignored on
+    the first invokation of the lambda_handler_ingest.
+
+    Args:
+        ssm (client): ssm client for AWS
+        parameter_name (str): name of the parameter to be
+        retrieved from the parameter store
+
+    Returns:
+        str: value of the parameter
+    """
     try:
         if parameter_name:
             response = ssm.get_parameters(Names=[parameter_name])
@@ -65,6 +86,18 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
 
 
 def format_raw_data_into_json(table_name, column_names, rows):
+    """function to format raw ingested data from a single table
+    into a suitable json format. Data types that are not json
+    serialisable are converted into a string.
+
+    Args:
+        table_name (str): name of the table to be formatted
+        column_names (list): list of column names
+        rows (list): list of tuples containing row data
+
+    Returns:
+        json: formatted json data
+    """
     formatted_output = {
         table_name: {"column_names": column_names, "rows": rows}
     }
@@ -74,11 +107,14 @@ def format_raw_data_into_json(table_name, column_names, rows):
 
 def check_database_updated():
     """Function to check if the database has been updated since the last time
-    it was checked."""
-    """Returns a list of the updated table names if the database has been
-    updated, and an empty list if there have been no updates to the
-    database."""
+    it was checked.
 
+    Returns:
+        list: On the first invokation, returns a list of all the table.
+        If the database has been updated, it returns a list of the
+        updated table names. If there have been no database updates, an
+        empty list is returned.
+    """
     conn = None
     all_table_names = [
         "transaction",
@@ -95,17 +131,9 @@ def check_database_updated():
     ]
 
     try:
-<<<<<<< HEAD
-        timestamp_prev = retrieve_parameter(ssm, "timestamp_now")  # 1981
-        print(timestamp_prev, "prev in check database util")
-        timestamp_now = datetime.now()  # 2025
-        print(timestamp_now, "now in check database util")
-        put_current_time(ssm, str(timestamp_now))  # 2025
-=======
         timestamp_prev = retrieve_parameter(ssm, "timestamp_now")
         timestamp_now = datetime.now()
         put_current_time(ssm, str(timestamp_now))
->>>>>>> a2b6426fc63cbe40742628496d817680565fca58
 
         conn = connect_to_rds()
         cur = conn.cursor()
@@ -117,9 +145,7 @@ def check_database_updated():
             WHERE last_updated BETWEEN '{timestamp_prev}'
             and '{timestamp_now}';"""
             cur.execute(query)
-            new_dates = (
-                cur.fetchall()
-            )  # fetches the rows, returning them as a list of tuples
+            new_dates = cur.fetchall()
             if new_dates:
                 updated_tables.append(table)
 
