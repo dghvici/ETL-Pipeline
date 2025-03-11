@@ -1,7 +1,15 @@
 import os
+import boto3
 import psycopg2
+from botocore.exceptions import ClientError
+import json
 from dotenv import load_dotenv
 import logging
+
+# Initialize Boto3 clients
+secretsmanager = boto3.client("secretsmanager", "eu-west-2")
+ssm = boto3.client("ssm", "eu-west-2")
+s3_client = boto3.client("s3")
 
 # load env variables
 load_dotenv()
@@ -11,6 +19,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
+######################################################################
 def connect_to_rds(raise_exception=False):
     try:
         connection = psycopg2.connect(
@@ -35,34 +44,20 @@ def connect_to_rds(raise_exception=False):
         return None
 
 
-###############################################################################
-
-
-def execute_query(query, params=None):
-    conn = connect_to_rds()
-    if conn is None:
-        logger.error("Failed to connect to RDS")
-        return None
-
-    try:
-        cursor = conn.cursor()
-        cursor.execute(query, params)
-        results = cursor.fetchall()
-        cursor.close()
-        return results
-    except Exception as error:
-        logger.error(f"Error executing query: {error}")
-        return None
-    finally:
-        close_rds(conn)
-
-
-###############################################################################
-
-
+######################################################################
 def close_rds(conn):
     if conn is not None:
         conn.close()
         logger.info("Connection to RDS closed")
     else:
         logger.error("Connection to RDS is already closed")
+
+
+######################################################################
+def get_secret(secret_name):
+    try:
+        response = secretsmanager.get_secret_value(SecretId=secret_name)
+        return json.loads(response["SecretString"])
+    except ClientError as e:
+        logger.error(f"Error retrieving secret {secret_name}: {e}")
+        raise e
