@@ -59,3 +59,4 @@ resource "aws_cloudwatch_metric_alarm" "lambda_ingest_error_alarm" {
         aws_sns_topic.cloudwatch_ingest_alarm_topic.arn
     ]
 }
+

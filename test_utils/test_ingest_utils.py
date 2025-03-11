@@ -3,8 +3,10 @@
 #     put_current_time,
 #     retrieve_parameter,
 #     put_prev_time,
+#     format_raw_data_into_json
 # )
 # from moto import mock_aws
+# import datetime
 
 # # from unittest.mock import patch
 # import os
@@ -92,3 +94,18 @@
 # #     ]
 
 # #     assert response == all_tables
+
+
+# class TestFormatter:
+#     def test_formatter(self):
+#         rows = [
+#             (18336,
+#              'SALE',
+#              12979,
+#              None,
+#              datetime.datetime(2025, 3, 5, 11, 6, 10, 363000))
+#         ]
+#         column_names = ["col", "col1", "col2", "col3", "col4", "col5"]
+#         table_name = "test_table"
+#         response = format_raw_data_into_json(table_name, column_names, rows)
+#         assert response
