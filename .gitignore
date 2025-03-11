@@ -24,6 +24,9 @@ venv/
 **/.terraform*
 **/function.zip
 **/*.tfstate*
-dependencies/
+modules/
 packages/.terraform/
 modules/
+packages/
+packages
+awslambda-psycopg2
