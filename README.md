@@ -26,7 +26,7 @@ uses AWS Lambda functions to perform the data ingestion into an S3 bucket, trans
 
 ### Key challenges
 
-Although we made good progress on the project, we didn't quite complete the brief within the given time of two weeks. The majority of the AWS infrasture can be succesfully deployed with data ingested successfully, however the load function is not fully complete and thus full automation of the MVP is not complete.
+Although we made good progress on the project, we didn't quite complete the brief within the given time of two weeks. The majority of the AWS infrastructure can be succesfully deployed with data ingested, however the load function is not fully complete and thus full automation of pipeline and delivery of the MVP is not complete.
 
 Some of the key challenges included:
 
@@ -35,6 +35,7 @@ Some of the key challenges included:
 3. How to update the data every 30 minutes without duplication or corruption.
 4. Setting up suitable development, testing and production environments and deploying this in the pipeline.
 5. Testing functions that interact with operational databases.
+6. Provisioning multiple resources via Terraform that communicate with each other.
 
 
 ### Repo structure
@@ -123,7 +124,9 @@ We also learnt that things often take longer than expected - if we anticipate a 
 
 A big take away was that it is often easier to start simply and build complexity, rather than start adding complexity straight away.
 
-### As a group, how do we rate the poject success?
+The jazz music as we wait in slack is rather quite lovely.
+
+### As a group, how do we rate the project success?
 
 It's a shame we didn't finish, but we are proud of what we've learnt and how we worked together.
 
