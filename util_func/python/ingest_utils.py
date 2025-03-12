@@ -11,9 +11,9 @@ logger.setLevel(logging.INFO)
 
 
 def put_prev_time(ssm, timestamp_prev):
-    """function to put previous timestamp into the ssm
-    parameter store, for use in the lambda_ingest function.
-    Logs an error if the date is in the wrong format.
+    """Function to put previous timestamp into the ssm parameter store, for use
+    in the lambda_ingest function. Logs an error if the date is in the wrong
+    format.
 
     Args:
         ssm (client): ssm client for AWS
@@ -34,9 +34,9 @@ def put_prev_time(ssm, timestamp_prev):
 
 
 def put_current_time(ssm, timestamp_now):
-    """function to put the current timestamp into the ssm
-    parameter store, for use in the lambda_ingest function.
-    Logs an error if the date is in the wrong format.
+    """Function to put the current timestamp into the ssm parameter store, for
+    use in the lambda_ingest function. Logs an error if the date is in the
+    wrong format.
 
     Args:
         ssm (client): ssm client for AWS
@@ -57,9 +57,8 @@ def put_current_time(ssm, timestamp_now):
 
 
 def retrieve_parameter(ssm, parameter_name, **kwargs):
-    """function to retrieve a parameter from the parameter
-    store. Main use case for retrieving timestamp_prev and
-    timestamp_now.
+    """Function to retrieve a parameter from the parameter store. Main use case
+    for retrieving timestamp_prev and timestamp_now.
 
     Logs an error and raises and IndexError
     if the parameter does not exist - this can be ignored on
@@ -86,9 +85,9 @@ def retrieve_parameter(ssm, parameter_name, **kwargs):
 
 
 def format_raw_data_into_json(table_name, column_names, rows):
-    """function to format raw ingested data from a single table
-    into a suitable json format. Data types that are not json
-    serialisable are converted into a string.
+    """Function to format raw ingested data from a single table into a suitable
+    json format. Data types that are not json serialisable are converted into a
+    string.
 
     Args:
         table_name (str): name of the table to be formatted

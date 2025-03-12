@@ -23,9 +23,8 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler_load(event, context):
-    """Uploads data to the data warehouse star schema,
-    based on data uploaded to the transformed s3 bucket
-    (saved in parquet format).
+    """Uploads data to the data warehouse star schema, based on data uploaded
+    to the transformed s3 bucket (saved in parquet format).
 
     Args:
         event: s3 event message in JSON format, containing a record of the

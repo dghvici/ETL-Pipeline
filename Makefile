@@ -64,7 +64,7 @@ run-flake8:
 
 # Run the unit tests
 unit-test:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest ./test/*.py  ./test_utils/*.py -vvvrP )
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest ./test/*.py  ./test_utils/*.py )
 
 # Run the coverage check
 check-coverage:

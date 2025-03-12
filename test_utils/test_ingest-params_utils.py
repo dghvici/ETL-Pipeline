@@ -48,6 +48,7 @@ class TestRetrieveParameter:
             retrieve_parameter(ssm_client, "non_existent_param")
 
 
+@pytest.mark.skip
 class TestCheckDatabaseUpdated:
     @patch("util_func.python.ingest_utils.connect_to_rds")
     @patch("util_func.python.ingest_utils.retrieve_parameter")

@@ -18,11 +18,11 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler_ingest(event, context):
-    """lambda function to handle the ingest stage of the ETL pipeline.
-    It connects to the totesys database, checks if it has been updated
-    since the last invokation, formats the updated data into a json file
-    and puts it in the etl-lullymore-west-ingested bucket. All data from
-    the updated tables are saved into a single JSON file.
+    """Lambda function to handle the ingest stage of the ETL pipeline. It
+    connects to the totesys database, checks if it has been updated since the
+    last invokation, formats the updated data into a json file and puts it in
+    the etl-lullymore-west-ingested bucket. All data from the updated tables
+    are saved into a single JSON file.
 
     Args:
         event: required for lambda, however is not used in this function

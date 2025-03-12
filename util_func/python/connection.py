@@ -55,8 +55,8 @@ def connect_to_rds(raise_exception=False):
 
 
 def close_rds(conn):
-    """function to close the connection to the RDS database.
-    Logs an error if connection is already closed.
+    """Function to close the connection to the RDS database. Logs an error if
+    connection is already closed.
 
     Args:
         conn (connection): connection instance to the database.
@@ -69,7 +69,7 @@ def close_rds(conn):
 
 
 def get_secret(secret_name):
-    """function to get a secret from the AWS Secrets Manager.
+    """Function to get a secret from the AWS Secrets Manager.
 
     Raises an error if there is a problem retrieving the secret
     (i.e. issue connecting to Secrets Manager or if secretId
