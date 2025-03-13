@@ -12,8 +12,8 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "tf-state-lullymore-west-project"
-    key = "nc-dataeng-etl-project/terraform.tfstate"
+    bucket = "tf-state-file-202502171054"
+    key = "totesys-etl/terraform.tfstate"
     region = "eu-west-2"
   }
 }
