@@ -60,7 +60,7 @@ def lambda_handler_ingest(event, context):
             year = datetime.now().year
             month = datetime.now().month
             key = f"{year}/{month}/totesys-data-ingested-{current_time}"
-            bucket = "etl-lullymore-west-ingested"
+            bucket = "lullymore-west-ingested-2025"
             s3_client.put_object(Bucket=bucket, Key=key, Body=json_body)
             logger.info("All data has been ingested.")
         put_prev_time(ssm, str(current_time))

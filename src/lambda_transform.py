@@ -364,7 +364,7 @@ def lambda_handler_transform(event, context):
         final_dataframes = create_dataframes(df_tables)
         final_dataframes["df_dim_dates"] = create_dim_date()
 
-        transform_bucket = "etl-lullymore-west-transformed"
+        transform_bucket = "lullymore-west-transformed-2025"
         upload_dataframes_to_s3(final_dataframes, transform_bucket)
         logger.info(
             "All data has been transformed \

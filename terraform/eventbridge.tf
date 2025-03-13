@@ -62,7 +62,7 @@ resource "aws_cloudwatch_event_rule" "s3_object_created_transform" {
 EOF
 }
 
-#Lambda Target > Transform
+# Lambda Target > Transform
 resource "aws_cloudwatch_event_target" "lambda_target_transform" {
   rule      = aws_cloudwatch_event_rule.s3_object_created_transform.name
   target_id = "SendToLambda"
@@ -70,14 +70,7 @@ resource "aws_cloudwatch_event_target" "lambda_target_transform" {
   role_arn  = aws_iam_role.eventbridge_role.arn
 }
 
-#CODE UNUSED BUT COULD BE USEFUL. DECIDED TO USE S3 NOTIFICATION TRIGGER INSTEAD.
-# resource "aws_lambda_permission" "allow_eventbridge_transform" {
-#   statement_id  = "AllowExecutionFromEventBridge"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.transform_function.function_name
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.s3_object_created_transform.arn
-# }
+
 
 ############################## LOAD #####################################
 
@@ -105,13 +98,6 @@ resource "aws_cloudwatch_event_target" "lambda_target_load" {
 }
 
 
-resource "aws_lambda_permission" "allow_eventbridge_load" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.load_function.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.s3_object_created_load.arn
-}
 
 
 ######################## S3 NOTIFICATIONS ############################
