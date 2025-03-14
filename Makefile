@@ -35,6 +35,7 @@ requirements: create-environment
 	$(call execute_in_env, $(PIP) install -r ./requirements_lambda.txt -t modules/python)
 	$(call execute_in_env, $(GIT) clone https://github.com/jkehler/awslambda-psycopg2.git)
 	$(call execute_in_env, cp -r awslambda-psycopg2/psycopg2-3.11/* modules/python/)
+	$(call execute_in_env, $(PIP) install -r ./requirements_transform.txt -t modules_transform/python)
 
 
 # Run the security test (bandit)

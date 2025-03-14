@@ -46,7 +46,7 @@ resource "aws_lambda_function" "transform_function" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "lambda_transform.lambda_handler_transform"
   runtime       = "python3.10"
-  layers        = [aws_lambda_layer_version.modules_layer.arn,
+  layers        = [aws_lambda_layer_version.modules_layer_transform.arn,
   "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:23"]
   timeout       = var.default_timeout
   source_code_hash = data.archive_file.transform_lambda.output_base64sha512
@@ -67,7 +67,7 @@ resource "aws_lambda_function" "load_function" {
   source_code_hash = data.archive_file.load_lambda.output_base64sha512
 }
 
-# zipping the utils and modules separately.
+# zipping modules for ingest.
 data "archive_file" "modules_layer" {
   type        = "zip"
   output_file_mode = "0666"
@@ -82,3 +82,17 @@ resource "aws_lambda_layer_version" "modules_layer" {
   compatible_runtimes = ["python3.11"]
 }
 
+# zipping modules for ingest.
+data "archive_file" "modules_layer_tansform" {
+  type        = "zip"
+  output_file_mode = "0666"
+  output_path = "${path.module}/../packages/layers/modules_transform.zip"
+  source_dir = "${path.module}/../modules_transform/"
+}
+
+resource "aws_lambda_layer_version" "modules_layer_transform" {
+  filename   = "${path.module}/../packages/layers/modules_transform.zip"
+  layer_name = "lambda_transform_modules_layer"
+
+  compatible_runtimes = ["python3.11"]
+}
