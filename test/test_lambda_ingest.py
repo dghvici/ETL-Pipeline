@@ -421,9 +421,12 @@ class TestCheckDatabaseUpdated:
     @mock_aws
     @patch("src.lambda_ingest.retrieve_parameter", side_effect=IndexError)
     @patch("src.lambda_ingest.put_prev_time")
+    @patch("boto3.client")
     def test_check_db_updated_returns_all_tables_on_first_invokation(
-        self, mock_retrieve_parameter, mock_put_prev_time
+        self, mock_boto_client, mock_retrieve_parameter, mock_put_prev_time
     ):
+        mock_ssm_client = Mock()
+        mock_boto_client.return_value = mock_ssm_client
         response = check_database_updated()
         mock_retrieve_parameter.return_value = "2003-12-17T00:00:00"
         all_tables = [
