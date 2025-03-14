@@ -419,17 +419,13 @@ class TestFormatter:
 
 class TestCheckDatabaseUpdated:
     @mock_aws
-    @patch(
-        "src.lambda_ingest.retrieve_parameter",
-        side_effect=IndexError,
-    )
+    @patch("src.lambda_ingest.retrieve_parameter", side_effect=IndexError)
     @patch("src.lambda_ingest.put_prev_time")
     def test_check_db_updated_returns_all_tables_on_first_invokation(
         self, mock_retrieve_parameter, mock_put_prev_time
     ):
-        mock_put_prev_time.return_value = None
         response = check_database_updated()
-
+        mock_retrieve_parameter.return_value = "2003-12-17T00:00:00"
         all_tables = [
             "transaction",
             "design",
@@ -444,6 +440,7 @@ class TestCheckDatabaseUpdated:
             "purchase_order",
         ]
 
+        mock_put_prev_time.return_value = None
         assert response == all_tables
 
     @patch("src.lambda_ingest.connect_to_rds")
