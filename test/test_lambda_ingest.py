@@ -41,8 +41,10 @@ class TestIngestion:
     @patch("src.lambda_ingest.connect_to_rds")
     @patch("src.lambda_ingest.retrieve_parameter")
     @patch("src.lambda_ingest.boto3.client")
+    @patch("src.lambda_ingest.put_prev_time")
     def test_ingestion_with_no_new_data(
         self,
+        mock_put_prev_time,
         mock_boto_client,
         mock_get_parameter,
         mock_connect_to_rds,
@@ -57,86 +59,102 @@ class TestIngestion:
         mock_boto_client.return_value = mock_s3_client
         mock_get_parameter.return_value = "2021-07-27T16:02:08.070557"
         mock_check_database_updated.return_value = []
+        mock_put_prev_time.return_value = None
         event = {}
         context = {}
         lambda_handler_ingest(event, context)
         assert "No new data." in caplog.text
 
     @mock_aws
+    @patch("src.lambda_ingest.put_prev_time")
+    @patch("src.lambda_ingest.boto3.client")
+    @patch("src.lambda_ingest.retrieve_parameter")
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
-    @patch("src.lambda_ingest.retrieve_parameter")
-    @patch("src.lambda_ingest.boto3.client")
     def test_connection_ingests_all_data(
         self,
-        mock_boto_client,
-        mock_get_parameter,
         mock_connect_to_rds,
         mock_check_database_updated,
+        mock_get_parameter,
+        mock_boto_client,
+        mock_put_prev_time,
         caplog,
     ):
-        mock_check_database_updated.return_value = ["transaction"]
-        mock_conn = Mock()
-        mock_cur = Mock()
+        mock_conn = MagicMock()
         mock_connect_to_rds.return_value = mock_conn
+        mock_cur = MagicMock()
         mock_conn.cursor.return_value = mock_cur
-        mock_s3_client = Mock()
-        mock_boto_client.return_value = mock_s3_client
+        print(mock_cur)
+
+        mock_check_database_updated.return_value = ["transaction"]
         mock_get_parameter.return_value = "2021-07-27T16:02:08.070557"
         mock_cur.fetchall.return_value = [{"id": 1, "data": "sample data"}]
         mock_cur.description = [("col1",), ("col2",)]
+
+        mock_s3_client = Mock()
+        mock_boto_client.return_value = mock_s3_client
+        mock_put_prev_time.return_value = None
         event = {}
         context = {}
         lambda_handler_ingest(event, context)
         assert "All data has been ingested." in caplog.text
 
     @mock_aws
+    @patch("src.lambda_ingest.put_prev_time")
+    @patch("src.lambda_ingest.boto3.client")
+    @patch("src.lambda_ingest.retrieve_parameter")
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
-    @patch("src.lambda_ingest.retrieve_parameter")
-    @patch("src.lambda_ingest.boto3.client")
     def test_if_updates_in_db_ingested(
         self,
-        mock_boto_client,
-        mock_get_parameter,
         mock_connect_to_rds,
         mock_check_database_updated,
+        mock_get_parameter,
+        mock_boto_client,
+        mock_put_prev_time,
     ):
-        mock_check_database_updated.return_value = ["transaction"]
         mock_conn = Mock()
         mock_cur = Mock()
         mock_connect_to_rds.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cur
-        mock_s3_client = Mock()
-        mock_boto_client.return_value = mock_s3_client
+        mock_check_database_updated.return_value = ["transaction"]
         mock_get_parameter.return_value = "2021-07-27T16:02:08.070557"
         mock_cur.fetchall.return_value = [{"id": 1, "data": "sample data"}]
         mock_cur.description = [("col1",), ("col2",)]
+        mock_s3_client = Mock()
+        mock_boto_client.return_value = mock_s3_client
+        mock_put_prev_time.return_value = None
+        # Debug prints
+        print(f"mock_conn: {mock_conn}")
+        print(f"mock_cur: {mock_cur}")
+        print(f"mock_conn.cursor(): {mock_conn.cursor()}")
         event = {}
         context = {}
         lambda_handler_ingest(event, context)
         assert mock_get_parameter.call_count == 2
 
     @mock_aws
+    @patch("src.lambda_ingest.put_prev_time")
+    @patch("src.lambda_ingest.boto3.client")
+    @patch("src.lambda_ingest.retrieve_parameter")
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
-    @patch("src.lambda_ingest.retrieve_parameter")
-    @patch("src.lambda_ingest.boto3.client")
     def test_that_file_successfully_uploaded_to_s3(
         self,
-        mock_boto_client,
-        mock_get_parameter,
         mock_connect_to_rds,
+        mock_get_parameter,
         mock_check_database_updated,
+        mock_boto_client,
+        mock_put_prev_time,
     ):
-        mock_check_database_updated.return_value = ["transaction"]
         mock_conn = Mock()
         mock_cur = Mock()
         mock_connect_to_rds.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cur
+        mock_get_parameter.return_value = "2021-07-27T16:02:08.070557"
+        mock_check_database_updated.return_value = ["transaction"]
         mock_s3_client = Mock()
         mock_boto_client.return_value = mock_s3_client
-        mock_get_parameter.return_value = "2021-07-27T16:02:08.070557"
         mock_cur.fetchall.return_value = [
             (
                 1,
@@ -156,6 +174,7 @@ class TestIngestion:
             ),
         ]
         mock_cur.description = [("col1",), ("col2",)]
+        mock_put_prev_time.return_value = None
         event = {}
         context = {}
         lambda_handler_ingest(event, context)
@@ -404,9 +423,11 @@ class TestCheckDatabaseUpdated:
         "src.lambda_ingest.retrieve_parameter",
         side_effect=IndexError,
     )
+    @patch("src.lambda_ingest.put_prev_time")
     def test_check_db_updated_returns_all_tables_on_first_invokation(
-        self, mock_retrieve_parameter
+        self, mock_retrieve_parameter, mock_put_prev_time
     ):
+        mock_put_prev_time.return_value = None
         response = check_database_updated()
 
         all_tables = [
