@@ -5,6 +5,11 @@ resource "aws_s3_bucket" "ingestion_bucket" {
   }
 }
 
+resource "aws_s3_bucket_notification" "ingestion_notification" {
+  bucket = aws_s3_bucket.ingestion_bucket.id
+  eventbridge = true
+}
+
 resource "aws_s3_bucket" "transform_bucket" {
 
   bucket = "lullymore-west-transformed-2025"
@@ -13,3 +18,7 @@ resource "aws_s3_bucket" "transform_bucket" {
   }
 }
 
+resource "aws_s3_bucket_notification" "transform_bucket_notification" {
+  bucket = aws_s3_bucket.transform_bucket.id
+  eventbridge = true
+}

@@ -345,7 +345,7 @@ def lambda_handler_transform(event, context):
     """
     try:
         s3 = boto3.client("s3")
-
+        logger.info(event)
         source_bucket = event["Records"][0]["s3"]["bucket"]["name"]
         source_key = event["Records"][0]["s3"]["object"]["key"]
 
