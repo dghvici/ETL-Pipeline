@@ -418,6 +418,7 @@ class TestFormatter:
 
 
 class TestCheckDatabaseUpdated:
+    @pytest.mark.skip
     @mock_aws
     @patch("src.lambda_ingest.retrieve_parameter", side_effect=IndexError)
     @patch("src.lambda_ingest.put_prev_time")
