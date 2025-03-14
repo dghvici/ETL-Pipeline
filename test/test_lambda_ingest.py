@@ -36,6 +36,7 @@ def ssm_client(aws_credentials):
 
 
 class TestIngestion:
+    @mock_aws
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
     @patch("src.lambda_ingest.retrieve_parameter")
@@ -61,6 +62,7 @@ class TestIngestion:
         lambda_handler_ingest(event, context)
         assert "No new data." in caplog.text
 
+    @mock_aws
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
     @patch("src.lambda_ingest.retrieve_parameter")
@@ -88,6 +90,7 @@ class TestIngestion:
         lambda_handler_ingest(event, context)
         assert "All data has been ingested." in caplog.text
 
+    @mock_aws
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
     @patch("src.lambda_ingest.retrieve_parameter")
@@ -114,6 +117,7 @@ class TestIngestion:
         lambda_handler_ingest(event, context)
         assert mock_get_parameter.call_count == 2
 
+    @mock_aws
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
     @patch("src.lambda_ingest.retrieve_parameter")
@@ -157,6 +161,7 @@ class TestIngestion:
         lambda_handler_ingest(event, context)
         assert mock_s3_client.put_object.call_count == 1
 
+    @mock_aws
     @patch("src.lambda_ingest.check_database_updated")
     @patch("src.lambda_ingest.connect_to_rds")
     @patch("src.lambda_ingest.retrieve_parameter")
@@ -394,6 +399,7 @@ class TestFormatter:
 
 
 class TestCheckDatabaseUpdated:
+    @mock_aws
     @patch(
         "src.lambda_ingest.retrieve_parameter",
         side_effect=IndexError,
