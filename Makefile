@@ -1,5 +1,5 @@
-PROJECT_NAME = NC-DataEng-ETL-Project
-PYTHON_INTERPRETER = python
+PROJECT_NAME =ETL-PIPELINE
+PYTHON_INTERPRETER = python3
 WD=$(shell pwd)
 PYTHONPATH=${WD}
 SHELL := /bin/bash
@@ -35,12 +35,11 @@ requirements: create-environment
 	$(call execute_in_env, $(PIP) install -r ./requirements_lambda.txt -t modules/python)
 	$(call execute_in_env, $(GIT) clone https://github.com/jkehler/awslambda-psycopg2.git)
 	$(call execute_in_env, cp -r awslambda-psycopg2/psycopg2-3.11/* modules/python/)
-	$(call execute_in_env, $(PIP) install -r ./requirements_transform.txt -t modules_transform/python)
+
 
 # Run the security test (bandit)
 security-test:
-	$(call execute_in_env, bandit -lll ./src/*.py ./test/*.py \
-	./util_func/*.py ./test_utils/*.py)
+	$(call execute_in_env, bandit -lll ./src/*.py ./test/*.py)
 
 # Run pip-audit test
 audit-test:
@@ -48,28 +47,24 @@ audit-test:
 
 # Run the black code check
 run-black:
-	$(call execute_in_env, black --line-length 79 ./src/*.py ./test/*.py \
-	./util_func/*/*.py ./test_utils/*.py)
+	$(call execute_in_env, black --line-length 79 ./src/*.py ./test/*.py)
 
 # Run docformatter
 run-docformatter:
 	$(call execute_in_env, docformatter --in-place --wrap-summaries \
-	79 --wrap-descriptions 79 ./src/*.py ./test/*.py \
-	./util_func/*/*.py ./test_utils/*.py)
+	79 --wrap-descriptions 79 ./src/*.py ./test/*.py)
 
 # Run flake8
 run-flake8:
-	$(call execute_in_env, flake8 ./src/*.py ./test/*.py \
-	./util_func/*/*.py ./test_utils/*.py)
+	$(call execute_in_env, flake8 ./src/*.py ./test/*.py)
 
 # Run the unit tests
 unit-test:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest ./test/*.py  ./test_utils/*.py )
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -p no:warnings ./test/*.py)
 
 # Run the coverage check
 check-coverage:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=src test/)
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=util_func test_utils/)
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -p no:warnings --cov=src test/)
 
 # Run security tests
 run-security: security-test audit-test

@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch, MagicMock
 import psycopg2
 import pytest
-from util_func.python.connection import connect_to_rds, close_rds
+from utils.python.connection import connect_to_rds, close_rds
 from dotenv import load_dotenv
 
 load_dotenv()

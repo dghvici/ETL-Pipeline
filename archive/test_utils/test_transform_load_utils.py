@@ -1,9 +1,5 @@
-from utils.transform_load_utils import get_table_name
+from utils.python.transform_load_utils import get_table_name
 import pytest
-
-# import boto3
-# from moto import mock_aws
-# import os
 
 
 class TestGetTableName:

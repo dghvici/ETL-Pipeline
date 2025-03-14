@@ -25,7 +25,7 @@ resource "aws_lambda_function" "ingest_function" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "lambda_ingest.lambda_handler_ingest"
   runtime       = "python3.11"
-  layers        = [aws_lambda_layer_version.modules_layer.arn, aws_lambda_layer_version.utils_layer.arn]
+  layers        = [aws_lambda_layer_version.modules_layer.arn]
   timeout       = var.default_timeout
   source_code_hash = data.archive_file.ingest_lambda.output_base64sha512
   environment {
@@ -46,7 +46,7 @@ resource "aws_lambda_function" "transform_function" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "lambda_transform.lambda_handler_transform"
   runtime       = "python3.10"
-  layers        = [aws_lambda_layer_version.modules_layer_transform.arn, 
+  layers        = [aws_lambda_layer_version.modules_layer.arn,
   "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:23"]
   timeout       = var.default_timeout
   source_code_hash = data.archive_file.transform_lambda.output_base64sha512
@@ -63,7 +63,7 @@ resource "aws_lambda_function" "load_function" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "lambda_load.lambda_handler_load"
   runtime       = "python3.12"
-  layers        = [aws_lambda_layer_version.modules_layer_transform.arn]
+  layers        = [aws_lambda_layer_version.modules_layer.arn]
   source_code_hash = data.archive_file.load_lambda.output_base64sha512
 }
 
@@ -82,31 +82,3 @@ resource "aws_lambda_layer_version" "modules_layer" {
   compatible_runtimes = ["python3.11"]
 }
 
-data "archive_file" "utils_layer" {
-  type        = "zip"
-  output_file_mode = "0666"
-  output_path = "${path.module}/../packages/layers/utils.zip"
-  source_dir = "${path.module}/../util_func/"
-}
-
-resource "aws_lambda_layer_version" "utils_layer" {
-  filename   = "${path.module}/../packages/layers/utils.zip"
-  layer_name = "lambda_utils_layer"
-
-  compatible_runtimes = ["python3.11"]
-}
-
-
-data "archive_file" "modules_layer_transform" {
-  type        = "zip"
-  output_file_mode = "0666"
-  output_path = "${path.module}/../packages/layers/modules_transform.zip"
-  source_dir = "${path.module}/../modules_transform/"
-}
-
-resource "aws_lambda_layer_version" "modules_layer_transform" {
-  filename   = "${path.module}/../packages/layers/modules_transform.zip"
-  layer_name = "lambda_transform_modules_layer"
-
-  compatible_runtimes = ["python3.11"]
-}

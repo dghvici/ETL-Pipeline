@@ -1,8 +1,7 @@
 import os
 import boto3
 import psycopg2
-from botocore.exceptions import ClientError
-import json
+
 from dotenv import load_dotenv
 import logging
 
@@ -68,22 +67,23 @@ def close_rds(conn):
         logger.error("Connection to RDS is already closed")
 
 
-def get_secret(secret_name):
-    """Function to get a secret from the AWS Secrets Manager.
+# Not Tested
+# def get_secret(secret_name):
+#     """Function to get a secret from the AWS Secrets Manager.
 
-    Raises an error if there is a problem retrieving the secret
-    (i.e. issue connecting to Secrets Manager or if secretId
-    incorrect).
+#     Raises an error if there is a problem retrieving the secret
+#     (i.e. issue connecting to Secrets Manager or if secretId
+#     incorrect).
 
-    Args:
-        secret_name (str): string representing the SecretId
+#     Args:
+#         secret_name (str): string representing the SecretId
 
-    Returns:
-        The value of the secret.
-    """
-    try:
-        response = secretsmanager.get_secret_value(SecretId=secret_name)
-        return json.loads(response["SecretString"])
-    except ClientError as e:
-        logger.error(f"Error retrieving secret {secret_name}: {e}")
-        raise e
+#     Returns:
+#         The value of the secret.
+#     """
+#     try:
+#         response = secretsmanager.get_secret_value(SecretId=secret_name)
+#         return json.loads(response["SecretString"])
+#     except ClientError as e:
+#         logger.error(f"Error retrieving secret {secret_name}: {e}")
+#         raise e

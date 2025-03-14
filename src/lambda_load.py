@@ -1,11 +1,11 @@
 import boto3
+import re
 import pyarrow.parquet as pq
 from io import BytesIO
 from sqlalchemy import create_engine
 import logging
 from botocore.exceptions import ClientError
 import os
-from utils.transform_load_utils import get_table_name
 
 s3_client = boto3.client("s3")
 
@@ -20,6 +20,25 @@ port = os.getenv("OLAP_PORT")
 # configure logger
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+def get_table_name(file_key):
+    """Function to extract the table name from the filenames."""
+    try:
+        if "ingested" in file_key:
+            re_pattern = r"ingested-(\w+)"
+        elif "transformed" in file_key:
+            re_pattern = r"transformed-(\w+)"
+
+        match = re.search(re_pattern, file_key)
+        table_name = match.group(1)
+        return table_name
+    except UnboundLocalError:
+        logger.error(
+            "File name does not conform to the expected \
+        format (does not include 'ingested' or 'transformed')"
+        )
+        raise
 
 
 def lambda_handler_load(event, context):

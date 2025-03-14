@@ -1,8 +1,6 @@
 import re
 import boto3
 
-# import pyarrow.parquet as pq
-# from io import BytesIO
 import logging
 
 s3_client = boto3.client("s3")

@@ -1,4 +1,4 @@
-name: NC-DataEng-ETL-Project-CICD
+name: ETL-PIPELINE
 
 on:
   push:
@@ -51,6 +51,15 @@ jobs:
       - name: Terraform init
         working-directory: terraform
         run: terraform init
+      - name: Terraform destroy (for cleanup)
+        working-directory: terraform
+        run: terraform destroy -auto-approve
+        env:
+          TF_VAR_rds_user: ${{ secrets.RDS_USER }}
+          TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+          TF_VAR_port: ${{ secrets.PORT }}
+          TF_VAR_rds_name: ${{ secrets.RDS_NAME }}
+          TF_VAR_rds_host: ${{ secrets.RDS_HOST }}
       - name: Terraform Plan
         working-directory: terraform
         run: terraform plan

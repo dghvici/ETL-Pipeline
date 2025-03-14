@@ -3,7 +3,7 @@ from datetime import datetime
 import logging
 import json
 
-from util_func.python.connection import connect_to_rds, close_rds
+from utils.python.connection import connect_to_rds, close_rds
 
 ssm = boto3.client("ssm", "eu-west-2")
 logger = logging.getLogger()
